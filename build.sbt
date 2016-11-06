@@ -1,7 +1,7 @@
 
 organization := "arimitsu.sf"
 
-name := "scala-template"
+name := "Platform"
 
 version := "0.0.1-SNAPSHOT"
 
@@ -65,6 +65,6 @@ testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/Sc
 
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/ScalaTest-reports/unit")
 
-assemblyJarName in assembly := s"scala-template-assembly-${version.value}.jar"
+assemblyJarName in assembly := s"platform-${version.value}.jar"
 
 mainClass in assembly := Some("arimitsu.sf.platform.Bootstrap")
