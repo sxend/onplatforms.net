@@ -11,7 +11,3 @@ class IndexRouter(env: {
       |<h1>Hello, World.</h1>
     """.stripMargin
 }
-
-object IndexRouter {
-  def apply(env: {}) = new IndexRouter(env)
-}
