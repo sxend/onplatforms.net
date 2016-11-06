@@ -1,10 +1,10 @@
 package arimitsu.sf.platform
 
 import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
+import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl._
-import akka.http.scaladsl.server.Directives._
+import server.Directives._
 import router._
 
 object Bootstrap {
