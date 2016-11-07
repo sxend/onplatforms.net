@@ -1,0 +1,15 @@
+{
+  "name": "platform-front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "serve": "node app.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.0",
+    "express-handlebars": "^3.0.0"
+  }
+}
