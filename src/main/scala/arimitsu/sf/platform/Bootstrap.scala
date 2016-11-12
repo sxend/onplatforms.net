@@ -15,7 +15,7 @@ object Bootstrap {
       lazy val indexRouter = new IndexRouter(this)
     }
     import env._
-    val route = logRequestResult("access-log", Logging.InfoLevel) {
+    val route = logRequest("access-log", Logging.InfoLevel) {
       get(path("")(indexRouter.handle))
     }
     Http().bindAndHandle(route, "0.0.0.0", 8080)
