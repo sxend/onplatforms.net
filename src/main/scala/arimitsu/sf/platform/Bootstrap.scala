@@ -13,10 +13,12 @@ object Bootstrap {
       implicit val system = ActorSystem("platform-system")
       implicit val materializer = ActorMaterializer()
       lazy val indexRouter = new IndexRouter(this)
+      lazy val mypageRouter = new MypageRouter(this)
     }
     import env._
     val route = logRequest("access-log", Logging.InfoLevel) {
-      get(path("")(indexRouter.handle))
+      get(path("")(indexRouter.handle)) ~
+        get(path("mypage")(mypageRouter.handle))
     }
     Http().bindAndHandle(route, "0.0.0.0", 8080)
   }
