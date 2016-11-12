@@ -14,7 +14,7 @@ class IndexRouter(env: {
 }) {
   implicit val templateImplicit = TemplateDirective.Implicits(env.system)
 
-  def handle = template("templates/index.html", Map("value" -> "foo")) {
+  def handle = template("templates/index.html", Map("value" -> "World")) {
     case Success(html) => complete(htmlEntity(html))
     case _             => reject
   }

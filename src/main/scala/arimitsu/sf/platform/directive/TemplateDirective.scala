@@ -14,12 +14,7 @@ import scala.util.Try
 
 trait TemplateDirective {
 
-  private val config = ConfigFactory.load.getConfig("akka.http.server.template-engine")
-  private val engine = {
-    val _engine = new TemplateEngine(mode = config.getString("mode"))
-    _engine.codeGenerators = _engine.codeGenerators ++ Map("html" -> _engine.codeGenerators("mustache"))
-    _engine
-  }
+  import TemplateDirective._
 
   def template(resourceName: String, attributes: Map[String, Any])(f: Try[String] => Route)(implicit implicits: TemplateDirective.Implicits) =
     onComplete(Future(engine.layout(resourceName, attributes))(implicits.ioDispatcher))(f)
@@ -27,6 +22,12 @@ trait TemplateDirective {
 }
 
 object TemplateDirective extends TemplateDirective {
+  private val config = ConfigFactory.load.getConfig("akka.http.server.template-engine")
+  private val engine = {
+    val _engine = new TemplateEngine(mode = config.getString("mode"))
+    _engine.codeGenerators = _engine.codeGenerators ++ Map("html" -> _engine.codeGenerators("mustache"))
+    _engine
+  }
   case class Implicits(system: ActorSystem) {
     val ioDispatcher: ExecutionContext =
       system.dispatchers.lookup("arimitsu.sf.platform.blocking-io-dispatcher")
