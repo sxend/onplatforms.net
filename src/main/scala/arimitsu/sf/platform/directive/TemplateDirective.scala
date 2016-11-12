@@ -1,15 +1,15 @@
 package arimitsu.sf.platform.directive
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.directives.BasicDirectives.{extractSettings => _, pass => _}
-import akka.http.scaladsl.server.directives.CacheConditionDirectives.{conditional => _}
-import akka.http.scaladsl.server.directives.RouteDirectives.{complete => _, reject => _}
+import akka.http.scaladsl.server.directives.BasicDirectives.{ extractSettings => _, pass => _ }
+import akka.http.scaladsl.server.directives.CacheConditionDirectives.{ conditional => _ }
+import akka.http.scaladsl.server.directives.RouteDirectives.{ complete => _, reject => _ }
 import com.typesafe.config.ConfigFactory
 import org.fusesource.scalate.TemplateEngine
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
 
 trait TemplateDirective {
@@ -21,8 +21,7 @@ trait TemplateDirective {
     _engine
   }
 
-  def template(resourceName: String, attributes: Map[String, Any])(f: Try[String] => Route)
-              (implicit implicits: TemplateDirective.Implicits) =
+  def template(resourceName: String, attributes: Map[String, Any])(f: Try[String] => Route)(implicit implicits: TemplateDirective.Implicits) =
     onComplete(Future(engine.layout(resourceName, attributes))(implicits.ioDispatcher))(f)
 
 }
