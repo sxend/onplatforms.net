@@ -28,16 +28,11 @@ class Twitter(env: {
     }(ioDispatcher)
   }
   def getMappedUser(twitterUserId: String): Future[Option[String]] = {
-    env.memcached.client.get[String](twitterUserId).map { x =>
-      println(s"getMappedUser: $twitterUserId, $x")
-      x
-    }
+    env.memcached.client.get[String](twitterUserId)
   }
 
   def mappingUser(twitterUserId: String, userId: String): Future[Unit] = {
-    env.memcached.client.set(twitterUserId, userId, Int.MaxValue.seconds).map { x =>
-      println(s"mappingUser: $twitterUserId, $userId, $x")
-    }
+    env.memcached.client.set(twitterUserId, userId, Int.MaxValue.seconds)
   }
 
 }
