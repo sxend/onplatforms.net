@@ -16,7 +16,7 @@ trait TemplateDirective {
 
   import TemplateDirective._
 
-  def template(resourceName: String, attributes: Map[String, Any])(f: Try[String] => Route)(implicit implicits: TemplateDirective.Implicits) =
+  def template(resourceName: String, attributes: Map[String, Any] = Map.empty)(f: Try[String] => Route)(implicit implicits: TemplateDirective.Implicits) =
     onComplete(Future(engine.layout(resourceName, attributes))(implicits.ioDispatcher))(f)
 
 }

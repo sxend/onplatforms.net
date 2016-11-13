@@ -1,6 +1,5 @@
 package arimitsu.sf.platform.router
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 

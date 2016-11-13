@@ -19,8 +19,8 @@ class MypageRouter(env: {
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
   import env._
 
-  def handle = authenticated {
-    template("templates/mypage.html", Map("userName" -> "member")) {
+  def handle = authenticated { (userId, userName) =>
+    template("templates/mypage.html", Map("userId" -> userId, "userName" -> userName)) {
       case Success(html) => complete(htmlEntity(html))
       case _             => reject
     }
