@@ -21,6 +21,7 @@ libraryDependencies ++= {
   val spec2Version = "3.8.4"
   val scalaTestVersion = "2.2.6"
   Seq(
+    "com.bionicspirit" %% "shade" % "1.7.4",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-core" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion,
