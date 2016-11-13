@@ -2,27 +2,30 @@ package arimitsu.sf.platform.router
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.Credentials
 import arimitsu.sf.platform.Directives._
-import arimitsu.sf.platform.directive.TemplateDirective
+import arimitsu.sf.platform.directive.{ AuthenticationDirective, TemplateDirective }
 
 import scala.concurrent.Future
 import scala.util.Success
 
 class MypageRouter(env: {
   val system: ActorSystem
+  val templateDirectiveImplicits: TemplateDirective.Implicits
+  val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
 }) {
-  implicit val system = env.system
-  implicit val templateImplicit = TemplateDirective.Implicits(system)
+  implicit val templateImplicits = env.templateDirectiveImplicits
+  implicit val authenticationImplicits = env.authenticationDirectiveImplicits
+  import env._
 
-  def handle = authenticateOAuth2Async(realm = "", authenticator) { userName =>
-    template("templates/mypage.html", Map("userName" -> userName)) {
+  def handle = authenticated {
+    template("templates/mypage.html", Map("userName" -> "member")) {
       case Success(html) => complete(htmlEntity(html))
       case _             => reject
     }
   }
+
   private def authenticator(credentials: Credentials): Future[Option[String]] = {
     import system.dispatcher
     credentials match {

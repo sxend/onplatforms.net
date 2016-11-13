@@ -22,14 +22,16 @@ trait TemplateDirective {
 }
 
 object TemplateDirective extends TemplateDirective {
-  private val config = ConfigFactory.load.getConfig("akka.http.server.template-engine")
+  private val config = ConfigFactory.load.getConfig("arimitsu.sf.platform.directives.template-engine")
   private val engine = {
     val _engine = new TemplateEngine(mode = config.getString("mode"))
     _engine.codeGenerators = _engine.codeGenerators ++ Map("html" -> _engine.codeGenerators("mustache"))
     _engine
   }
-  case class Implicits(system: ActorSystem) {
+  case class Implicits(env: {
+    val system: ActorSystem
+  }) {
     val ioDispatcher: ExecutionContext =
-      system.dispatchers.lookup("arimitsu.sf.platform.blocking-io-dispatcher")
+      env.system.dispatchers.lookup("arimitsu.sf.platform.dispatchers.blocking-io-dispatcher")
   }
 }

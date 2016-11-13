@@ -10,9 +10,9 @@ import arimitsu.sf.platform.directive.TemplateDirective
 import scala.util.Success
 
 class IndexRouter(env: {
-  val system: ActorSystem
+  val templateDirectiveImplicits: TemplateDirective.Implicits
 }) {
-  implicit val templateImplicit = TemplateDirective.Implicits(env.system)
+  implicit val templateImplicits = env.templateDirectiveImplicits
 
   def handle = template("templates/index.html", Map("value" -> "World")) {
     case Success(html) => complete(htmlEntity(html))
