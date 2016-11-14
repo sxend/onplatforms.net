@@ -31,7 +31,8 @@ object Bootstrap {
         get(path("mypage")(mypageRouter.handle)) ~
         get(path("signin")(signinRouter.handle)) ~
         get(path("signin" / "twitter")(signinRouter.twitterSignin)) ~
-        get(path("signin" / "twitter-callback")(signinRouter.twitterCallback))
+        get(path("signin" / "twitter-callback")(signinRouter.twitterCallback)) ~
+        get(path("signout")(signinRouter.signout))
     }
     Http().bindAndHandle(route, "0.0.0.0", 8080)
   }

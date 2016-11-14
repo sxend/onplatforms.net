@@ -11,7 +11,7 @@ import org.apache.commons.lang3.SerializationUtils
 import shade.memcached.MemcachedCodecs
 
 import scala.concurrent.duration._
-import scala.collection.JavaConverters._
+import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 
 trait SessionDirective extends AnyRef with MemcachedCodecs {
@@ -20,8 +20,11 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
     optionalCookie("session-id") {
       case Some(pair) =>
         onComplete(implicits.env.memcached.client.get[Array[Byte]](pair.value)) {
-          case Success(Some(bytes)) => f(deserialize(bytes))
-          case _                    => newScope(f)
+          case Success(Some(bytes)) => onComplete(deserialize(bytes)) {
+            case Success(session) => f(session)
+            case _                => newScope(f)
+          }
+          case _ => newScope(f)
         }
       case _ => newScope(f)
     }
@@ -29,30 +32,40 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
   private def newScope(f: Session => Route)(implicit implicits: Implicits) = {
     val newSessionId = UUID.randomUUID().toString
     val newSession: Session = Map("id" -> newSessionId)
-    onComplete(implicits.env.memcached.client.set[Array[Byte]](newSessionId, serialize(newSession), Int.MaxValue.seconds)) {
-      case Success(_) => setCookie(HttpCookie("session-id", newSessionId, path = Option("/"), maxAge = Option(86400 * 30))) {
-        f(newSession)
-      }
+    onComplete(serialize(newSession)) {
+      case Success(bytes) =>
+        onComplete(implicits.env.memcached.client.set[Array[Byte]](newSessionId, bytes, Int.MaxValue.seconds)) {
+          case Success(_) => setCookie(HttpCookie("session-id", newSessionId, path = Option("/"), maxAge = Option(86400 * 30))) {
+            f(newSession)
+          }
+          case Failure(t) => failWith(t)
+        }
       case Failure(t) => failWith(t)
     }
+
   }
 
-  def invalidateAndNewSession(route: Route)(implicit implicits: Implicits) = newScope((_) => route)
+  def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits) = newScope(route)
 
   def invalidateSession(route: Route)(implicit implicits: Implicits) =
     deleteCookie("session-id", path = "/")(route)
 
   def persistSession(newSession: Session)(route: Route)(implicit implicits: Implicits) =
-    onComplete(implicits.env.memcached.client.set[Array[Byte]](newSession("id").toString, serialize(newSession), Int.MaxValue.seconds)) {
-      case Success(_) => route
+    onComplete(serialize(newSession)) {
+      case Success((bytes)) =>
+        onComplete(implicits.env.memcached.client.set[Array[Byte]](newSession("id").toString, bytes, Int.MaxValue.seconds)) {
+          case Success(_) => route
+          case Failure(t) => failWith(t)
+        }
       case Failure(t) => failWith(t)
     }
-  private def serialize(session: Session): Array[Byte] = {
-    SerializationUtils.serialize(session.asInstanceOf[Serializable])
+
+  private def serialize(session: Session)(implicit implicits: Implicits): Future[Array[Byte]] = {
+    Future(SerializationUtils.serialize(session.asInstanceOf[Serializable]))(implicits.ioDispatcher)
   }
 
-  private def deserialize(bytes: Array[Byte]): Session = {
-    SerializationUtils.deserialize[Session](bytes)
+  private def deserialize(bytes: Array[Byte])(implicit implicits: Implicits): Future[Session] = {
+    Future(SerializationUtils.deserialize[Session](bytes))(implicits.ioDispatcher)
   }
 }
 
@@ -62,5 +75,6 @@ object SessionDirective extends SessionDirective {
     val memcached: Memcached
     val system: ActorSystem
   }) {
+    val ioDispatcher = env.system.dispatchers.lookup("arimitsu.sf.platform.dispatchers.blocking-io-dispatcher")
   }
 }
