@@ -21,6 +21,7 @@ libraryDependencies ++= {
   val spec2Version = "3.8.4"
   val scalaTestVersion = "2.2.6"
   Seq(
+    "org.apache.commons" % "commons-lang3" % "3.5",
     "com.bionicspirit" %% "shade" % "1.7.4",
     "org.twitter4j" % "twitter4j-async" % "4.0.5",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
