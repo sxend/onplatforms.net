@@ -30,7 +30,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-jackson-experimental" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-xml-experimental" % akkaVersion,
-    "org.scalatra.scalate" %% "scalate-core" % "1.8.0",
+    "com.mitchellbosecke" % "pebble" % "2.2.3",
     "com.chuusai" %% "shapeless" % shapelessVersion,
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "org.specs2" %% "specs2-html" % spec2Version % "test",
