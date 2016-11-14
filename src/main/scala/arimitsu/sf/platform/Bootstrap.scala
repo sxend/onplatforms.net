@@ -2,13 +2,13 @@ package arimitsu.sf.platform
 
 import akka.actor.ActorSystem
 import akka.event.Logging
-import akka.stream.ActorMaterializer
 import akka.http.scaladsl._
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
 import arimitsu.sf.platform.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
 import arimitsu.sf.platform.external.TwitterOps
 import arimitsu.sf.platform.kvs.Memcached
-import server.Directives._
-import router._
+import arimitsu.sf.platform.router._
 
 object Bootstrap {
   def main(args: Array[String]): Unit = {

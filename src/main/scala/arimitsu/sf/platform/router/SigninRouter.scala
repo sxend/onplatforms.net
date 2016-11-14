@@ -5,7 +5,6 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.Directives._
 import arimitsu.sf.platform.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
 import arimitsu.sf.platform.external.TwitterOps
@@ -24,13 +23,9 @@ class SigninRouter(env: {
   val twitter: TwitterOps
 }) {
 
-  import SigninRouter._
-
   implicit val templateImplicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
   implicit val sessionImplicits = env.sessionDirectiveImplicits
-
-  import env.system.dispatcher
 
   def handle = template("templates/signin.html") {
     case Success(html) => complete(htmlEntity(html))

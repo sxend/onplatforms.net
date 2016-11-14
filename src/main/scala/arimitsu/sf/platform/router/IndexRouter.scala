@@ -2,7 +2,6 @@ package arimitsu.sf.platform.router
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-
 import arimitsu.sf.platform.Directives._
 import arimitsu.sf.platform.directive.TemplateDirective
 

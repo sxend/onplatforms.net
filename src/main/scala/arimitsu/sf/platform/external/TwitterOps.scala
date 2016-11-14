@@ -5,8 +5,7 @@ import java.io.File
 import akka.actor.ActorSystem
 import arimitsu.sf.platform.kvs.Memcached
 import com.typesafe.config.ConfigFactory
-import twitter4j.TwitterFactory
-import twitter4j.Twitter
+import twitter4j.{ Twitter, TwitterFactory }
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -15,7 +14,6 @@ class TwitterOps(env: {
   val system: ActorSystem
   val memcached: Memcached
 }) {
-  import TwitterOps._
   implicit val ioDispatcher = env.system.dispatchers.lookup("arimitsu.sf.platform.dispatchers.blocking-io-dispatcher")
 
   def getAuthenticationURL(implicit twitter: Twitter): Future[String] =

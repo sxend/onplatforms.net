@@ -1,15 +1,15 @@
 package arimitsu.sf.platform.directive
 
 import akka.event.LoggingAdapter
-import akka.http.scaladsl.model.{ DateTime, StatusCodes }
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 
-import scala.util.{ Failure, Success }
 import scala.concurrent.duration._
+import scala.util.{ Failure, Success }
 
 trait AuthenticationDirective {
   import AuthenticationDirective._

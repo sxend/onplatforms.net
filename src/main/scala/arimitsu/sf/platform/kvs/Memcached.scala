@@ -2,8 +2,7 @@ package arimitsu.sf.platform.kvs
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import shade.memcached.Configuration
-import shade.memcached.{ Memcached => Shade }
+import shade.memcached.{ Configuration, Memcached => Shade }
 
 import scala.concurrent.ExecutionContext
 

@@ -3,13 +3,13 @@ package arimitsu.sf.platform.directive
 import java.io.{ StringWriter, Writer }
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.BasicDirectives.{ extractSettings => _, pass => _ }
 import akka.http.scaladsl.server.directives.CacheConditionDirectives.{ conditional => _ }
 import akka.http.scaladsl.server.directives.RouteDirectives.{ complete => _, reject => _ }
-import com.typesafe.config.ConfigFactory
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server._
 import com.mitchellbosecke.pebble.PebbleEngine
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try

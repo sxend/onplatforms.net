@@ -4,14 +4,14 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers.HttpCookie
-import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.kvs.Memcached
 import org.apache.commons.lang3.SerializationUtils
 import shade.memcached.MemcachedCodecs
 
-import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
 
 trait SessionDirective extends AnyRef with MemcachedCodecs {
