@@ -20,13 +20,13 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
     optionalCookie("session-id") {
       case Some(pair) =>
         onComplete(getFromMemcache(pair.value)) {
-          case Success(Some(bytes)) => onDeserialize(bytes)(f)(_ => newScope(f))
+          case Success(Some(bytes)) => onDeserialize(bytes)(f, _ => newScope(f))
           case _                    => newScope(f)
         }
       case _ => newScope(f)
     }
   }
-  private def newScope(f: Session => Route)(implicit implicits: Implicits) = {
+  private def newScope(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) = {
     val newSessionId = UUID.randomUUID().toString
     val newSession: Session = Map("id" -> newSessionId)
     onSerialize(newSession) { bytes =>
@@ -34,7 +34,7 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
         case Success(_) => setCookie(HttpCookie("session-id", newSessionId, path = Option("/"), maxAge = Option(86400 * 30))) {
           f(newSession)
         }
-        case Failure(t) => failWith(t)
+        case Failure(t) => onFail(t)
       }
     }
   }
@@ -44,11 +44,11 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
   def invalidateSession(route: Route)(implicit implicits: Implicits) =
     deleteCookie("session-id", path = "/")(route)
 
-  def persistSession(newSession: Session)(route: Route)(implicit implicits: Implicits) =
+  def persistSession(newSession: Session)(route: Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onSerialize(newSession) { bytes =>
       onComplete(setToMemcache(newSession("id").toString, bytes)) {
         case Success(_) => route
-        case Failure(t) => failWith(t)
+        case Failure(t) => onFail(t)
       }
     }
 
@@ -57,12 +57,12 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
   private def getFromMemcache(id: String)(implicit implicits: Implicits) =
     implicits.env.memcached.client.get[Array[Byte]](id)
 
-  private def onSerialize(newSession: Session)(route: Array[Byte] => Route)(implicit implicits: Implicits) =
+  private def onSerialize(newSession: Session)(route: Array[Byte] => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onComplete(serialize(newSession)) {
       case Success(bytes) => route(bytes)
-      case Failure(t)     => failWith(t)
+      case Failure(t)     => onFail(t)
     }
-  private def onDeserialize(bytes: Array[Byte])(route: Session => Route)(onFail: => OnFail = failWith)(implicit implicits: Implicits) =
+  private def onDeserialize(bytes: Array[Byte])(route: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onComplete(deserialize(bytes)) {
       case Success(session) => route(session)
       case Failure(t)       => onFail(t)
