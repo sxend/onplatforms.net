@@ -19,12 +19,9 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
   def withSession(f: => Session => Route)(implicit implicits: Implicits) = {
     optionalCookie("session-id") {
       case Some(pair) =>
-        onComplete(implicits.env.memcached.client.get[Array[Byte]](pair.value)) {
-          case Success(Some(bytes)) => onComplete(deserialize(bytes)) {
-            case Success(session) => f(session)
-            case _                => newScope(f)
-          }
-          case _ => newScope(f)
+        onComplete(getFromMemcache(pair.value)) {
+          case Success(Some(bytes)) => onDeserialize(bytes)(f)(_ => newScope(f))
+          case _                    => newScope(f)
         }
       case _ => newScope(f)
     }
@@ -32,17 +29,14 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
   private def newScope(f: Session => Route)(implicit implicits: Implicits) = {
     val newSessionId = UUID.randomUUID().toString
     val newSession: Session = Map("id" -> newSessionId)
-    onComplete(serialize(newSession)) {
-      case Success(bytes) =>
-        onComplete(implicits.env.memcached.client.set[Array[Byte]](newSessionId, bytes, Int.MaxValue.seconds)) {
-          case Success(_) => setCookie(HttpCookie("session-id", newSessionId, path = Option("/"), maxAge = Option(86400 * 30))) {
-            f(newSession)
-          }
-          case Failure(t) => failWith(t)
+    onSerialize(newSession) { bytes =>
+      onComplete(setToMemcache(newSessionId, bytes)) {
+        case Success(_) => setCookie(HttpCookie("session-id", newSessionId, path = Option("/"), maxAge = Option(86400 * 30))) {
+          f(newSession)
         }
-      case Failure(t) => failWith(t)
+        case Failure(t) => failWith(t)
+      }
     }
-
   }
 
   def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits) = newScope(route)
@@ -51,22 +45,32 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
     deleteCookie("session-id", path = "/")(route)
 
   def persistSession(newSession: Session)(route: Route)(implicit implicits: Implicits) =
-    onComplete(serialize(newSession)) {
-      case Success((bytes)) =>
-        onComplete(implicits.env.memcached.client.set[Array[Byte]](newSession("id").toString, bytes, Int.MaxValue.seconds)) {
-          case Success(_) => route
-          case Failure(t) => failWith(t)
-        }
-      case Failure(t) => failWith(t)
+    onSerialize(newSession) { bytes =>
+      onComplete(setToMemcache(newSession("id").toString, bytes)) {
+        case Success(_) => route
+        case Failure(t) => failWith(t)
+      }
     }
 
-  private def serialize(session: Session)(implicit implicits: Implicits): Future[Array[Byte]] = {
-    Future(SerializationUtils.serialize(session.asInstanceOf[Serializable]))(implicits.ioDispatcher)
-  }
+  private def setToMemcache(id: String, bytes: Array[Byte])(implicit implicits: Implicits) =
+    implicits.env.memcached.client.set[Array[Byte]](id, bytes, Int.MaxValue.seconds)
+  private def getFromMemcache(id: String)(implicit implicits: Implicits) =
+    implicits.env.memcached.client.get[Array[Byte]](id)
 
-  private def deserialize(bytes: Array[Byte])(implicit implicits: Implicits): Future[Session] = {
+  private def onSerialize(newSession: Session)(route: Array[Byte] => Route)(implicit implicits: Implicits) =
+    onComplete(serialize(newSession)) {
+      case Success(bytes) => route(bytes)
+      case Failure(t)     => failWith(t)
+    }
+  private def onDeserialize(bytes: Array[Byte])(route: Session => Route)(onFail: => Throwable => Route = failWith)(implicit implicits: Implicits) =
+    onComplete(deserialize(bytes)) {
+      case Success(session) => route(session)
+      case Failure(t)       => onFail(t)
+    }
+  private def serialize(session: Session)(implicit implicits: Implicits): Future[Array[Byte]] =
+    Future(SerializationUtils.serialize(session.asInstanceOf[Serializable]))(implicits.ioDispatcher)
+  private def deserialize(bytes: Array[Byte])(implicit implicits: Implicits): Future[Session] =
     Future(SerializationUtils.deserialize[Session](bytes))(implicits.ioDispatcher)
-  }
 }
 
 object SessionDirective extends SessionDirective {
