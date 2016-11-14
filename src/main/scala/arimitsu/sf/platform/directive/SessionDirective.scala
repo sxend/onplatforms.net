@@ -62,7 +62,7 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
       case Success(bytes) => route(bytes)
       case Failure(t)     => failWith(t)
     }
-  private def onDeserialize(bytes: Array[Byte])(route: Session => Route)(onFail: => Throwable => Route = failWith)(implicit implicits: Implicits) =
+  private def onDeserialize(bytes: Array[Byte])(route: Session => Route)(onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onComplete(deserialize(bytes)) {
       case Success(session) => route(session)
       case Failure(t)       => onFail(t)
@@ -75,6 +75,7 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
 
 object SessionDirective extends SessionDirective {
   type Session = Map[String, Any]
+  type OnFail = Throwable => Route
   case class Implicits(env: {
     val memcached: Memcached
     val system: ActorSystem
