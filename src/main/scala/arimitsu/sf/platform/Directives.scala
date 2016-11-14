@@ -1,10 +1,11 @@
 package arimitsu.sf.platform
 
-import arimitsu.sf.platform.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
 
 trait Directives extends AnyRef
     with TemplateDirective
-    with AuthenticationDirective {
+    with AuthenticationDirective
+    with SessionDirective {
 
 }
 

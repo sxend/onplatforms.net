@@ -5,10 +5,12 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.Directives._
-import arimitsu.sf.platform.directive.{ AuthenticationDirective, TemplateDirective }
-import arimitsu.sf.platform.external.Twitter
+import arimitsu.sf.platform.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
+import arimitsu.sf.platform.external.TwitterOps
 import arimitsu.sf.platform.kvs.Memcached
+import twitter4j.Twitter
 
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
@@ -17,30 +19,42 @@ class SigninRouter(env: {
   val system: ActorSystem
   val templateDirectiveImplicits: TemplateDirective.Implicits
   val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
+  val sessionDirectiveImplicits: SessionDirective.Implicits
   val memcached: Memcached
-  val twitter: Twitter
+  val twitter: TwitterOps
 }) {
 
   import SigninRouter._
 
   implicit val templateImplicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
+  implicit val sessionImplicits = env.sessionDirectiveImplicits
 
-  import env._
-  import system.dispatcher
+  import env.system.dispatcher
 
   def handle = template("templates/signin.html") {
     case Success(html) => complete(htmlEntity(html))
     case _             => reject
   }
 
-  def twitter = onComplete(env.twitter.getAuthenticationURL) {
-    case Success(url) => redirect(url, StatusCodes.Found)
-    case _            => reject
+  def signout = invalidateSession(redirect("/", StatusCodes.Found))
+
+  def twitterSignin = provide(TwitterOps.newTwitter) { implicit twitter =>
+    onComplete(env.twitter.getAuthenticationURL) {
+      case Success(url) => withSession { session =>
+        persistSession(session ++ Map("twitter" -> twitter)) {
+          redirect(url, StatusCodes.Found)
+        }
+      }
+      case _ => reject
+    }
   }
 
-  def twitterCallback = parameters("oauth_token", "oauth_verifier") { (_, oauthVerifier) =>
-    TwitterSignin.callback(oauthVerifier)
+  def twitterCallback = withSession { session =>
+    provide(session.get("twitter").map(_.asInstanceOf[Twitter])) {
+      case Some(twitter) => TwitterSignin.callback(twitter)
+      case _             => reject
+    }
   }
 
   private def genUUID = UUID.randomUUID().toString
@@ -53,11 +67,13 @@ class SigninRouter(env: {
   private def htmlEntity(html: String) =
     HttpEntity(ContentTypes.`text/html(UTF-8)`, html)
   object TwitterSignin {
-    def callback(oauthVerifier: String) =
-      onComplete(env.twitter.verify(oauthVerifier)) {
-        case Success((twitterUserId, twitterUserName)) =>
-          TwitterSignin.verify(twitterUserId, twitterUserName)
-        case Failure(t) => failWith(t)
+    def callback(implicit twitter: Twitter) =
+      parameters("oauth_token", "oauth_verifier") { (oauthToken, oauthVerifier) =>
+        onComplete(env.twitter.verify(oauthVerifier)) {
+          case Success((twitterUserId, twitterUserName)) =>
+            TwitterSignin.verify(twitterUserId, twitterUserName)
+          case Failure(t) => failWith(t)
+        }
       }
     private def verify(twitterUserId: String, twitterUserName: String) =
       onComplete(env.twitter.getMappedUser(twitterUserId = twitterUserId)) {

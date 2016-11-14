@@ -6,22 +6,24 @@ import akka.actor.ActorSystem
 import arimitsu.sf.platform.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import twitter4j.TwitterFactory
+import twitter4j.Twitter
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class Twitter(env: {
+class TwitterOps(env: {
   val system: ActorSystem
   val memcached: Memcached
 }) {
-  import Twitter._
+  import TwitterOps._
   implicit val ioDispatcher = env.system.dispatchers.lookup("arimitsu.sf.platform.dispatchers.blocking-io-dispatcher")
 
-  def getAuthenticationURL: Future[String] =
+  def getAuthenticationURL(implicit twitter: Twitter): Future[String] =
     Future {
       twitter.getOAuthRequestToken("http://localhost:8080/signin/twitter-callback").getAuthenticationURL
     }(ioDispatcher)
-  def verify(verifier: String): Future[(String, String)] = {
+
+  def verify(verifier: String)(implicit twitter: Twitter): Future[(String, String)] = {
     Future {
       val result = twitter.getOAuthAccessToken(verifier)
       (result.getUserId.toString, result.getScreenName)
@@ -37,15 +39,14 @@ class Twitter(env: {
 
 }
 
-object Twitter {
+object TwitterOps {
   val config = ConfigFactory.load
     .withFallback(ConfigFactory.parseFile(new File(s"${System.getenv().get("HOME")}/.twitter/credentials")))
   val consumerKey = config.getString("twitter.consumer-key")
   val consumerKeySecret = config.getString("twitter.consumer-key-secret")
-  val twitter = {
+  def newTwitter = {
     val tw = new TwitterFactory().getInstance()
     tw.setOAuthConsumer(consumerKey, consumerKeySecret)
     tw
   }
-
 }
