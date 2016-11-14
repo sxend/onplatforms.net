@@ -47,11 +47,8 @@ class SigninRouter(env: {
   private def succeed(userId: String) =
     setSession(genUUID, userId)(redirect("/mypage", StatusCodes.Found))
 
-  private def registerUser(userId: String, name: String) = {
-    env.memcached.client.set(userId, name, Int.MaxValue.seconds).map { x =>
-      println(s"registerUser: $userId, $name, $x")
-    }
-  }
+  private def registerUser(userId: String, name: String) =
+    env.memcached.client.set(userId, name, Int.MaxValue.seconds)
 
   private def htmlEntity(html: String) =
     HttpEntity(ContentTypes.`text/html(UTF-8)`, html)
