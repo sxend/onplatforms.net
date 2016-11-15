@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.router
+package arimitsu.sf.platform.www.router
 
 import java.util.UUID
 
@@ -6,10 +6,10 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import arimitsu.sf.platform.Directives._
-import arimitsu.sf.platform.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
-import arimitsu.sf.platform.external.TwitterOps
-import arimitsu.sf.platform.kvs.Memcached
+import arimitsu.sf.platform.www.directive.Directives._
+import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
+import arimitsu.sf.platform.www.external.TwitterOps
+import arimitsu.sf.platform.www.kvs.Memcached
 import twitter4j.Twitter
 
 import scala.concurrent.duration._
@@ -28,7 +28,7 @@ class SigninRouter(env: {
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
   implicit val sessionImplicits = env.sessionDirectiveImplicits
 
-  def handle = template("templates/signin.html") {
+  def handle = template("www/templates/signin.html") {
     case Success(html) => complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, html))
     case _             => reject
   }

@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.directive
+package arimitsu.sf.platform.www.directive
 
 import java.io.{ StringWriter, Writer }
 

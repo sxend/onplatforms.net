@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.directive
+package arimitsu.sf.platform.www.directive
 
 import java.util.UUID
 
@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import arimitsu.sf.platform.kvs.Memcached
+import arimitsu.sf.platform.www.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.lang3.SerializationUtils
 import shade.memcached.MemcachedCodecs

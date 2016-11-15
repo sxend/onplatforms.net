@@ -1,11 +1,11 @@
-package arimitsu.sf.platform.router
+package arimitsu.sf.platform.www.router
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.Credentials
-import arimitsu.sf.platform.Directives._
-import arimitsu.sf.platform.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.www.directive.Directives._
+import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, TemplateDirective }
 
 import scala.concurrent.Future
 import scala.util.Success
@@ -20,7 +20,7 @@ class MypageRouter(env: {
   import env._
 
   def handle = authenticated { (userId, userName) =>
-    template("templates/mypage.html", Map("userId" -> userId, "userName" -> userName)) {
+    template("www/templates/mypage.html", Map("userId" -> userId, "userName" -> userName)) {
       case Success(html) => complete(htmlEntity(html))
       case _             => reject
     }

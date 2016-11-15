@@ -1,9 +1,9 @@
-package arimitsu.sf.platform.router
+package arimitsu.sf.platform.www.router
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import arimitsu.sf.platform.Directives._
-import arimitsu.sf.platform.directive.TemplateDirective
+import arimitsu.sf.platform.www.directive.Directives._
+import arimitsu.sf.platform.www.directive.TemplateDirective
 
 import scala.util.Success
 
@@ -12,7 +12,7 @@ class IndexRouter(env: {
 }) {
   implicit val templateImplicits = env.templateDirectiveImplicits
 
-  def handle = template("templates/index.html", Map("value" -> "World")) {
+  def handle = template("www/templates/index.html", Map("value" -> "World")) {
     case Success(html) => complete(htmlEntity(html))
     case _             => reject
   }

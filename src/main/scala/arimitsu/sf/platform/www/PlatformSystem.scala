@@ -1,16 +1,16 @@
-package arimitsu.sf.platform
+package arimitsu.sf.platform.www
 
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
-import arimitsu.sf.platform.external.TwitterOps
-import arimitsu.sf.platform.kvs.Memcached
-import arimitsu.sf.platform.router._
+import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
+import arimitsu.sf.platform.www.external.TwitterOps
+import arimitsu.sf.platform.www.kvs.Memcached
+import arimitsu.sf.platform.www.router._
 
-object Bootstrap {
+object PlatformSystem {
   def main(args: Array[String]): Unit = {
     val env = new {
       implicit val system = ActorSystem("platform-system")

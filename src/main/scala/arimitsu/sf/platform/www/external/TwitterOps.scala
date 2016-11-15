@@ -1,9 +1,9 @@
-package arimitsu.sf.platform.external
+package arimitsu.sf.platform.www.external
 
 import java.io.File
 
 import akka.actor.ActorSystem
-import arimitsu.sf.platform.kvs.Memcached
+import arimitsu.sf.platform.www.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import twitter4j.{ Twitter, TwitterFactory }
 

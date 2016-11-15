@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.kvs
+package arimitsu.sf.platform.www.kvs
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 class Memcached(env: {
   val system: ActorSystem
 }) {
-  private val config = ConfigFactory.load.getConfig("arimitsu.sf.platform.kvs.memcached")
+  private val config = ConfigFactory.load.getConfig("arimitsu.sf.platform.www.kvs.memcached")
   private val host = config.getString("host")
   private val port = config.getInt("port")
   private val dispatcher = config.getString("dispatcher")
