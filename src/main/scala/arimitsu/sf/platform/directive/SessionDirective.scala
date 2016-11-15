@@ -7,6 +7,7 @@ import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.kvs.Memcached
+import com.typesafe.config.ConfigFactory
 import org.apache.commons.lang3.SerializationUtils
 import shade.memcached.MemcachedCodecs
 
@@ -16,22 +17,32 @@ import scala.util.{ Failure, Success }
 
 trait SessionDirective extends AnyRef with MemcachedCodecs {
   import SessionDirective._
-  def withSession(f: => Session => Route)(implicit implicits: Implicits) = {
-    optionalCookie("session-id") {
+  def requireValidSession(f: => Session => Route)(implicit implicits: Implicits) =
+    optionalCookie(cookieKey) {
       case Some(pair) =>
         onComplete(getFromMemcache(pair.value)) {
-          case Success(Some(bytes)) => onDeserialize(bytes)(f, _ => newScope(f))
-          case _                    => newScope(f)
+          case Success(Some(bytes)) => onDeserialize(bytes)(f)
+          case Success(None)        => reject
+          case Failure(t)           => failWith(t)
         }
-      case _ => newScope(f)
+      case _ => reject
+    }
+  def getOrNewSession(f: => Session => Route)(implicit implicits: Implicits) = {
+    optionalCookie(cookieKey) {
+      case Some(pair) =>
+        onComplete(getFromMemcache(pair.value)) {
+          case Success(Some(bytes)) => onDeserialize(bytes)(f, _ => newSession(f))
+          case _                    => newSession(f)
+        }
+      case _ => newSession(f)
     }
   }
-  private def newScope(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) = {
+  def newSession(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) = {
     val newSessionId = UUID.randomUUID().toString
     val newSession: Session = Map("id" -> newSessionId)
     onSerialize(newSession) { bytes =>
       onComplete(setToMemcache(newSessionId, bytes)) {
-        case Success(_) => setCookie(HttpCookie("session-id", newSessionId, path = Option("/"), maxAge = Option(86400 * 30))) {
+        case Success(_) => setCookie(HttpCookie(cookieKey, newSessionId, maxAge = Option(86400 * 30 * 12), path = Option("/"))) {
           f(newSession)
         }
         case Failure(t) => onFail(t)
@@ -39,10 +50,10 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
     }
   }
 
-  def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits) = newScope(route)
+  def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits) = newSession(route)
 
   def invalidateSession(route: Route)(implicit implicits: Implicits) =
-    deleteCookie("session-id", path = "/")(route)
+    deleteCookie(cookieKey, path = "/")(route)
 
   def persistSession(newSession: Session)(route: Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onSerialize(newSession) { bytes =>
@@ -76,6 +87,8 @@ trait SessionDirective extends AnyRef with MemcachedCodecs {
 object SessionDirective extends SessionDirective {
   type Session = Map[String, Any]
   type OnFail = Throwable => Route
+  private val config = ConfigFactory.load.getConfig("arimitsu.sf.platform.directives.session")
+  private val cookieKey = config.getString("cookie.key")
   case class Implicits(env: {
     val memcached: Memcached
     val system: ActorSystem
