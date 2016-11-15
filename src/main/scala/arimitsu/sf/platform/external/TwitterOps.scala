@@ -27,13 +27,11 @@ class TwitterOps(env: {
       (result.getUserId.toString, result.getScreenName)
     }(ioDispatcher)
   }
-  def findUser(twitterUserId: String): Future[Option[String]] = {
+  def findUser(twitterUserId: String): Future[Option[String]] =
     env.memcached.client.get[String](twitterUserId)
-  }
 
-  def mappingUser(twitterUserId: String, userId: String): Future[Unit] = {
+  def mappingUser(twitterUserId: String, userId: String): Future[Unit] =
     env.memcached.client.set(twitterUserId, userId, Int.MaxValue.seconds)
-  }
 
 }
 
