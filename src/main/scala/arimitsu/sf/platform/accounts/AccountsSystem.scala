@@ -7,11 +7,13 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import arimitsu.sf.platform.accounts.router.SignupRouter
+import com.typesafe.config.ConfigFactory
 
 object AccountsSystem {
   def main(args: Array[String]): Unit = {
     val env = new {
-      implicit val system = ActorSystem("platform-system")
+      val config = ConfigFactory.load.withFallback(ConfigFactory.load("./accounts/application.conf"))
+      implicit val system = ActorSystem("accounts-system", this.config)
       implicit val materializer = ActorMaterializer()
       val logger = system.log
       val signupRouter = new SignupRouter(this)

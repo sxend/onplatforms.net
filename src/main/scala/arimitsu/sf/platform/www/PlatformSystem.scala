@@ -9,21 +9,29 @@ import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, SessionDire
 import arimitsu.sf.platform.www.external.TwitterOps
 import arimitsu.sf.platform.www.kvs.Memcached
 import arimitsu.sf.platform.www.router._
+import com.typesafe.config.{ Config, ConfigFactory }
+
+import scala.concurrent.ExecutionContext
 
 object PlatformSystem {
+  val configNameSpace = "arimitsu.sf.platform.www"
+  val withPrefix = (suffix: String) => s"$configNameSpace.$suffix"
   def main(args: Array[String]): Unit = {
     val env = new {
-      implicit val system = ActorSystem("platform-system")
+      val config: Config = ConfigFactory.load.withFallback(ConfigFactory.load("./www/application.conf"))
+      implicit val system = ActorSystem("platform-system", this.config)
       implicit val materializer = ActorMaterializer()
+      val blockingContext: ExecutionContext =
+        system.dispatchers.lookup(withPrefix("dispatchers.blocking-io-dispatcher"))
       val logger = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
       val sessionDirectiveImplicits = SessionDirective.Implicits(this)
-      lazy val indexRouter = new IndexRouter(this)
-      lazy val mypageRouter = new MypageRouter(this)
-      lazy val signinRouter = new SigninRouter(this)
-      lazy val memcached = new Memcached(this)
-      lazy val twitter = new TwitterOps(this)
+      val indexRouter = new IndexRouter(this)
+      val mypageRouter = new MypageRouter(this)
+      val signinRouter = new SigninRouter(this)
+      val memcached = new Memcached(this)
+      val twitter = new TwitterOps(this)
     }
     import env._
     val route = logRequest("access-log", Logging.InfoLevel) {

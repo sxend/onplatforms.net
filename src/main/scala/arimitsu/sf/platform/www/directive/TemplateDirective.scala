@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.directives.BasicDirectives.{ extractSettings =>
 import akka.http.scaladsl.server.directives.CacheConditionDirectives.{ conditional => _ }
 import akka.http.scaladsl.server.directives.RouteDirectives.{ complete => _, reject => _ }
 import com.mitchellbosecke.pebble.PebbleEngine
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
@@ -24,18 +24,17 @@ trait TemplateDirective {
       val writer = new StringWriter()
       engine.getTemplate(resourceName).evaluate(writer.asInstanceOf[Writer], attributes.asJava.asInstanceOf[java.util.Map[String, java.lang.Object]])
       writer.toString
-    }(implicits.ioDispatcher))(f)
+    }(implicits.env.blockingContext))(f)
 
 }
 
 object TemplateDirective extends TemplateDirective {
-  private val config = ConfigFactory.load.getConfig("arimitsu.sf.platform.directives.template-engine")
   private val engine = new PebbleEngine.Builder().build()
 
   case class Implicits(env: {
     val system: ActorSystem
+    val config: Config
+    val blockingContext: ExecutionContext
   }) {
-    val ioDispatcher: ExecutionContext =
-      env.system.dispatchers.lookup("arimitsu.sf.platform.dispatchers.blocking-io-dispatcher")
   }
 }

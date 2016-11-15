@@ -7,25 +7,25 @@ import arimitsu.sf.platform.www.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import twitter4j.{ Twitter, TwitterFactory }
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 
 class TwitterOps(env: {
   val system: ActorSystem
   val memcached: Memcached
+  val blockingContext: ExecutionContext
 }) {
-  implicit val ioDispatcher = env.system.dispatchers.lookup("arimitsu.sf.platform.dispatchers.blocking-io-dispatcher")
 
   def getAuthenticationURL(implicit twitter: Twitter): Future[String] =
     Future {
       twitter.getOAuthRequestToken("http://localhost:8080/signin/twitter-callback").getAuthenticationURL
-    }(ioDispatcher)
+    }(env.blockingContext)
 
   def verify(verifier: String)(implicit twitter: Twitter): Future[(String, String)] = {
     Future {
       val result = twitter.getOAuthAccessToken(verifier)
       (result.getUserId.toString, result.getScreenName)
-    }(ioDispatcher)
+    }(env.blockingContext)
   }
   def findUser(twitterUserId: String): Future[Option[String]] =
     env.memcached.client.get[String](twitterUserId)

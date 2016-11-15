@@ -8,11 +8,11 @@ import scala.concurrent.ExecutionContext
 
 class Memcached(env: {
   val system: ActorSystem
+  val blockingContext: ExecutionContext
 }) {
-  private val config = ConfigFactory.load.getConfig("arimitsu.sf.platform.www.kvs.memcached")
+
+  private val config = env.system.settings.config.getConfig("arimitsu.sf.platform.www.kvs.memcached")
   private val host = config.getString("host")
   private val port = config.getInt("port")
-  private val dispatcher = config.getString("dispatcher")
-  private implicit val ec: ExecutionContext = env.system.dispatchers.lookup(s"arimitsu.sf.platform.dispatchers.$dispatcher")
-  val client = Shade(Configuration(s"$host:$port"))
+  val client = Shade(Configuration(s"$host:$port"))(env.blockingContext)
 }
