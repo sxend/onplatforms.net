@@ -20,22 +20,14 @@ trait AuthenticationDirective {
       val userId = session("userId").asInstanceOf[String]
       onComplete(env.memcached.client.get[String](userId)) {
         case Success(Some(userName)) => route(userId, userName)
-        case Success(_)              => top
+        case Success(_)              => gotoTop
         case Failure(t) =>
           env.logger.error(t, t.getMessage)
-          top
+          gotoTop
       }
     }
   }
-  private def top = redirect("/", StatusCodes.Found)
-  //  def setSession(sessionId: String, userId: String)(route: Route)(implicit implicits: AuthenticationDirective.Implicits) = {
-  //    import implicits._
-  //    onComplete(env.memcached.client.set[String](sessionId, userId, timeout)) {
-  //      case Success(u) =>
-  //        setCookie(HttpCookie(key, sessionId, maxAge = Option(86400 * 30 * 12), path = Option("/")))(route)
-  //      case Failure(t) => failWith(t)
-  //    }
-  //  }
+  private def gotoTop = redirect("/", StatusCodes.Found)
 }
 
 object AuthenticationDirective extends AuthenticationDirective {
