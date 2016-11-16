@@ -12,7 +12,7 @@ import com.typesafe.config.ConfigFactory
 object AccountsSystem {
   def main(args: Array[String]): Unit = {
     val env = new {
-      val config = ConfigFactory.load.withFallback(ConfigFactory.load("./accounts/application.conf"))
+      val config = ConfigFactory.load("accounts/application.conf").withFallback(ConfigFactory.load())
       implicit val system = ActorSystem("accounts-system", this.config)
       implicit val materializer = ActorMaterializer()
       val logger = system.log
