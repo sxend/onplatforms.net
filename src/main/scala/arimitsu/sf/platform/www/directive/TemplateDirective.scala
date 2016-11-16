@@ -32,8 +32,6 @@ object TemplateDirective extends TemplateDirective {
   private val engine = new PebbleEngine.Builder().build()
 
   case class Implicits(env: {
-    val system: ActorSystem
-    val config: Config
     val blockingContext: ExecutionContext
   }) {
   }

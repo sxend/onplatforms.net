@@ -11,27 +11,16 @@ import scala.concurrent.Future
 import scala.util.Success
 
 class MypageRouter(env: {
-  val system: ActorSystem
   val templateDirectiveImplicits: TemplateDirective.Implicits
   val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
 }) {
   implicit val templateImplicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
-  import env._
 
   def handle = authenticated { (userId, userName) =>
     template("www/templates/mypage.html", Map("userId" -> userId, "userName" -> userName)) {
       case Success(html) => complete(htmlEntity(html))
       case _             => reject
-    }
-  }
-
-  private def authenticator(credentials: Credentials): Future[Option[String]] = {
-    import system.dispatcher
-    credentials match {
-      case p @ Credentials.Provided(token) =>
-        Future(Option(token))
-      case _ => Future.successful(None)
     }
   }
 

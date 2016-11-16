@@ -14,7 +14,7 @@ import Directives._
 import arimitsu.sf.platform.www.PlatformSystem
 trait AuthenticationDirective {
   import AuthenticationDirective._
-  def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits) = cookie(implicits.key) { cookiePair =>
+  def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits) = {
     import implicits._
     implicit val sessionImplicits = implicits.env.sessionDirectiveImplicits
     requireValidSession { session =>
@@ -36,8 +36,8 @@ object AuthenticationDirective extends AuthenticationDirective {
     val memcached: Memcached
     val logger: LoggingAdapter
     val sessionDirectiveImplicits: SessionDirective.Implicits
-    val config: Config
   }) {
-    val key = env.config.getString(PlatformSystem.withPrefix("directives.session.cookie.key"))
+    private val config = PlatformSystem.getConfigWithNamespace("directives.session")
+    val cookieKey = config.getString("cookie.key")
   }
 }

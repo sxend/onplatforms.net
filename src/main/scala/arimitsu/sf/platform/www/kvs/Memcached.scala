@@ -8,12 +8,9 @@ import shade.memcached.{ Configuration, Memcached => Shade }
 import scala.concurrent.ExecutionContext
 
 class Memcached(env: {
-  val system: ActorSystem
   val blockingContext: ExecutionContext
-  val config: Config
 }) {
-
-  private val config = env.config.getConfig(PlatformSystem.withPrefix("kvs.memcached"))
+  private val config = PlatformSystem.getConfigWithNamespace("kvs.memcached")
   private val host = config.getString("host")
   private val port = config.getInt("port")
   val client = Shade(Configuration(s"$host:$port"))(env.blockingContext)

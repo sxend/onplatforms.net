@@ -36,10 +36,9 @@ class TwitterOps(env: {
 }
 
 object TwitterOps {
-  val config = ConfigFactory.load
-    .withFallback(ConfigFactory.parseFile(new File(s"${System.getenv().get("HOME")}/.twitter/credentials")))
-  val consumerKey = config.getString("twitter.consumer-key")
-  val consumerKeySecret = config.getString("twitter.consumer-key-secret")
+  private val config = ConfigFactory.parseFile(new File(s"${System.getenv().get("HOME")}/.twitter/credentials"))
+  private val consumerKey = config.getString("twitter.consumer-key")
+  private val consumerKeySecret = config.getString("twitter.consumer-key-secret")
   def newTwitter = {
     val tw = new TwitterFactory().getInstance()
     tw.setOAuthConsumer(consumerKey, consumerKeySecret)

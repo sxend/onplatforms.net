@@ -90,10 +90,9 @@ object SessionDirective extends SessionDirective {
   type OnFail = Throwable => Route
   case class Implicits(env: {
     val memcached: Memcached
-    val system: ActorSystem
-    val config: Config
     val blockingContext: ExecutionContext
   }) {
-    val cookieKey = env.config.getString(PlatformSystem.withPrefix("directives.session.cookie.key"))
+    val config = PlatformSystem.getConfigWithNamespace("directives.session")
+    val cookieKey = config.getString("cookie.key")
   }
 }

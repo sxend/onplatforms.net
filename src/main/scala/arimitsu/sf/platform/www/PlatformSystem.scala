@@ -14,15 +14,17 @@ import com.typesafe.config.{ Config, ConfigFactory }
 import scala.concurrent.ExecutionContext
 
 object PlatformSystem {
-  val configNameSpace = "arimitsu.sf.platform.www"
-  val withPrefix = (suffix: String) => s"$configNameSpace.$suffix"
+  val config: Config = ConfigFactory.load.withFallback(ConfigFactory.load("www/application.conf"))
+  val namespace = "arimitsu.sf.platform.www"
+  def withNamespace(suffix: String) = s"$namespace.$suffix"
+  def getConfigWithNamespace(suffix: String) = config.getConfig(withNamespace(suffix))
   def main(args: Array[String]): Unit = {
     val env = new {
-      val config: Config = ConfigFactory.load.withFallback(ConfigFactory.load("./www/application.conf"))
+      val config: Config = PlatformSystem.config
       implicit val system = ActorSystem("platform-system", this.config)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
-        system.dispatchers.lookup(withPrefix("dispatchers.blocking-io-dispatcher"))
+        system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
       val logger = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
