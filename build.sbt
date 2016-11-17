@@ -12,7 +12,8 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
   Resolver.bintrayRepo("sxend", "releases"),
   Resolver.bintrayRepo("sxend", "snapshots"),
-  "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
+  "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/",
+  Resolver.bintrayRepo("iheartradio","maven")
 )
 
 libraryDependencies ++= {
@@ -25,6 +26,7 @@ libraryDependencies ++= {
     "com.bionicspirit" %% "shade" % "1.7.4",
     "org.twitter4j" % "twitter4j-async" % "4.0.5",
     "com.mitchellbosecke" % "pebble" % "2.2.3",
+    "com.iheart" %% "ficus" % "1.3.2",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-core" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion,

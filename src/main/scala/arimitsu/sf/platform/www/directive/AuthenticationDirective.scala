@@ -104,12 +104,13 @@ trait AuthenticationDirective {
 }
 
 object AuthenticationDirective extends AuthenticationDirective {
+  import net.ceedubs.ficus.Ficus._
   type Session = Map[String, Any]
   type OnFail = Throwable => Route
   private val config = PlatformSystem.getConfigInNamespace("directives.authentication")
   private val sessionConfig = config.getConfig("session")
   val cookieKey = sessionConfig.getString("cookie.key")
-  val maxAge = sessionConfig.getInt("cookie.max-age")
+  val maxAge = sessionConfig.as[FiniteDuration]("cookie.max-age").toSeconds
   val path = sessionConfig.getString("cookie.path")
   val domain = sessionConfig.getString("cookie.domain")
   case class Implicits(env: {
