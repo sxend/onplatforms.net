@@ -92,7 +92,7 @@ object SessionDirective extends SessionDirective {
     val memcached: Memcached
     val blockingContext: ExecutionContext
   }) {
-    val config = PlatformSystem.getConfigWithNamespace("directives.session")
+    val config = PlatformSystem.getConfigInNamespace("directives.session")
     val cookieKey = config.getString("cookie.key")
   }
 }

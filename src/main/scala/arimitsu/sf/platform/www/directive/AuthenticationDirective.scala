@@ -37,7 +37,7 @@ object AuthenticationDirective extends AuthenticationDirective {
     val logger: LoggingAdapter
     val sessionDirectiveImplicits: SessionDirective.Implicits
   }) {
-    private val config = PlatformSystem.getConfigWithNamespace("directives.session")
+    private val config = PlatformSystem.getConfigInNamespace("directives.session")
     val cookieKey = config.getString("cookie.key")
   }
 }

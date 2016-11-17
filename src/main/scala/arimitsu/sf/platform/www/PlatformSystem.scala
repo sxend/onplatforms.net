@@ -14,10 +14,10 @@ import com.typesafe.config.{ Config, ConfigFactory }
 import scala.concurrent.ExecutionContext
 
 object PlatformSystem {
-  val config: Config = ConfigFactory.load("www/application.conf").withFallback(ConfigFactory.load())
+  val config: Config = ConfigFactory.load
   val namespace = "arimitsu.sf.platform.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
-  def getConfigWithNamespace(suffix: String) = config.getConfig(withNamespace(suffix))
+  def getConfigInNamespace(suffix: String) = config.getConfig(withNamespace(suffix))
   def main(args: Array[String]): Unit = {
     val env = new {
       val config: Config = PlatformSystem.config

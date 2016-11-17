@@ -1,17 +1,16 @@
 package arimitsu.sf.platform.www.directive
 
-import java.io.{ StringWriter, Writer }
+import java.io.{StringWriter, Writer}
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.BasicDirectives.{ extractSettings => _, pass => _ }
-import akka.http.scaladsl.server.directives.CacheConditionDirectives.{ conditional => _ }
-import akka.http.scaladsl.server.directives.RouteDirectives.{ complete => _, reject => _ }
+import akka.http.scaladsl.server.directives.BasicDirectives.{extractSettings => _, pass => _}
+import akka.http.scaladsl.server.directives.CacheConditionDirectives.{conditional => _}
+import akka.http.scaladsl.server.directives.RouteDirectives.{complete => _, reject => _}
+import arimitsu.sf.platform.www.PlatformSystem
 import com.mitchellbosecke.pebble.PebbleEngine
-import com.typesafe.config.{ Config, ConfigFactory }
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 trait TemplateDirective {
@@ -29,7 +28,10 @@ trait TemplateDirective {
 }
 
 object TemplateDirective extends TemplateDirective {
-  private val engine = new PebbleEngine.Builder().build()
+  private val config = PlatformSystem.getConfigInNamespace("directives.template")
+  private val engine = new PebbleEngine.Builder()
+    .cacheActive(config.getBoolean("enabled-cache"))
+    .build()
 
   case class Implicits(env: {
     val blockingContext: ExecutionContext
