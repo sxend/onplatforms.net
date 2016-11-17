@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.www.router
+package arimitsu.sf.platform.accounts.router
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._

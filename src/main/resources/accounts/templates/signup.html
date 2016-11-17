@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>signup - Platform Accounts</title>
+</head>
+<body>
+<p>Signup</p>
+<form method="post" action="/signup/{{callbackUrlParam}}">
+    <input type="text" name="name"/>
+    <input type="password" name="password">
+    <input type="password" name="password_confirm">
+</form>
+<p>Signin With...</p>
+<p><a href="/signin/twitter/{{callbackUrlParam}}">with twitter</a></p>
+</body>
+</html>

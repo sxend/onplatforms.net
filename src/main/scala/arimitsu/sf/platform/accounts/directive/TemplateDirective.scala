@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.www.directive
+package arimitsu.sf.platform.accounts.directive
 
 import java.io.{ StringWriter, Writer }
 
@@ -7,7 +7,7 @@ import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.BasicDirectives.{ extractSettings => _, pass => _ }
 import akka.http.scaladsl.server.directives.CacheConditionDirectives.{ conditional => _ }
 import akka.http.scaladsl.server.directives.RouteDirectives.{ complete => _, reject => _ }
-import arimitsu.sf.platform.www.PlatformSystem
+import arimitsu.sf.platform.accounts.AccountsSystem
 import com.mitchellbosecke.pebble.PebbleEngine
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -28,7 +28,7 @@ trait TemplateDirective {
 }
 
 object TemplateDirective extends TemplateDirective {
-  private val config = PlatformSystem.getConfigInNamespace("directives.template")
+  private val config = AccountsSystem.getConfigInNamespace("directives.template")
   private val engine = new PebbleEngine.Builder()
     .cacheActive(config.getBoolean("enabled-cache"))
     .build()
