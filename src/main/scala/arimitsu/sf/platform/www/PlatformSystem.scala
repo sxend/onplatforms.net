@@ -5,7 +5,7 @@ import akka.event.Logging
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
+import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, TemplateDirective }
 import arimitsu.sf.platform.www.external.TwitterOps
 import arimitsu.sf.platform.www.kvs.Memcached
 import arimitsu.sf.platform.www.router._
@@ -28,7 +28,6 @@ object PlatformSystem {
       val logger = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
-      val sessionDirectiveImplicits = SessionDirective.Implicits(this)
       val indexRouter = new IndexRouter(this)
       val mypageRouter = new MypageRouter(this)
       val signinRouter = new SigninRouter(this)

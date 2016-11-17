@@ -3,6 +3,7 @@ package arimitsu.sf.platform.www.external
 import java.io.File
 
 import akka.actor.ActorSystem
+import arimitsu.sf.platform.www.PlatformSystem
 import arimitsu.sf.platform.www.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import twitter4j.{ Twitter, TwitterFactory }
@@ -15,10 +16,10 @@ class TwitterOps(env: {
   val memcached: Memcached
   val blockingContext: ExecutionContext
 }) {
-
+  import TwitterOps._
   def getAuthenticationURL(implicit twitter: Twitter): Future[String] =
     Future {
-      twitter.getOAuthRequestToken("http://localhost:8080/signin/twitter-callback").getAuthenticationURL
+      twitter.getOAuthRequestToken(callbackUrl).getAuthenticationURL
     }(env.blockingContext)
 
   def verify(verifier: String)(implicit twitter: Twitter): Future[(String, String)] = {
@@ -36,9 +37,12 @@ class TwitterOps(env: {
 }
 
 object TwitterOps {
-  private val config = ConfigFactory.parseFile(new File(s"${System.getenv().get("HOME")}/.twitter/credentials"))
-  private val consumerKey = config.getString("twitter.consumer-key")
-  private val consumerKeySecret = config.getString("twitter.consumer-key-secret")
+  private val config =
+    ConfigFactory.parseFile(new File(s"${System.getenv().get("HOME")}/.twitter/credentials")).getConfig("twitter")
+      .withFallback(PlatformSystem.getConfigInNamespace("external.twitter"))
+  private val consumerKey = config.getString("consumer-key")
+  private val consumerKeySecret = config.getString("consumer-key-secret")
+  private def callbackUrl = config.getString("callback-url")
   def newTwitter = {
     val tw = new TwitterFactory().getInstance()
     tw.setOAuthConsumer(consumerKey, consumerKeySecret)

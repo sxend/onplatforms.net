@@ -7,7 +7,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.www.directive.Directives._
-import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, SessionDirective, TemplateDirective }
+import arimitsu.sf.platform.www.directive.{ AuthenticationDirective, TemplateDirective }
 import arimitsu.sf.platform.www.external.TwitterOps
 import arimitsu.sf.platform.www.kvs.Memcached
 import twitter4j.Twitter
@@ -19,14 +19,12 @@ class SigninRouter(env: {
   val system: ActorSystem
   val templateDirectiveImplicits: TemplateDirective.Implicits
   val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
-  val sessionDirectiveImplicits: SessionDirective.Implicits
   val memcached: Memcached
   val twitter: TwitterOps
 }) {
 
   implicit val templateImplicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
-  implicit val sessionImplicits = env.sessionDirectiveImplicits
 
   def handle = template("www/templates/signin.html") {
     case Success(html) => complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, html))
@@ -72,13 +70,17 @@ class SigninRouter(env: {
     }
     def callback = {
       requireValidSession { session =>
-        implicit val twitter = session("twitter").asInstanceOf[Twitter]
-        parameters("oauth_token", "oauth_verifier") { (oauthToken, oauthVerifier) =>
-          onComplete(env.twitter.verify(oauthVerifier)) {
-            case Success((twitterUserId, twitterUserName)) =>
-              TwitterSignin.register(twitterUserId, twitterUserName)
-            case Failure(t) => failedSignIn(t)
-          }
+        session.get("twitter").filter(_.isInstanceOf[Twitter]).map(_.asInstanceOf[Twitter]) match {
+          case Some(tw: Twitter) =>
+            implicit val twitter = tw
+            parameters("oauth_token", "oauth_verifier") { (oauthToken, oauthVerifier) =>
+              onComplete(env.twitter.verify(oauthVerifier)) {
+                case Success((twitterUserId, twitterUserName)) =>
+                  TwitterSignin.register(twitterUserId, twitterUserName)
+                case Failure(t) => failedSignIn(t)
+              }
+            }
+          case _ => reject
         }
       }
     }

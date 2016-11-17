@@ -1,16 +1,16 @@
 package arimitsu.sf.platform.www.directive
 
-import java.io.{StringWriter, Writer}
+import java.io.{ StringWriter, Writer }
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.BasicDirectives.{extractSettings => _, pass => _}
-import akka.http.scaladsl.server.directives.CacheConditionDirectives.{conditional => _}
-import akka.http.scaladsl.server.directives.RouteDirectives.{complete => _, reject => _}
+import akka.http.scaladsl.server.directives.BasicDirectives.{ extractSettings => _, pass => _ }
+import akka.http.scaladsl.server.directives.CacheConditionDirectives.{ conditional => _ }
+import akka.http.scaladsl.server.directives.RouteDirectives.{ complete => _, reject => _ }
 import arimitsu.sf.platform.www.PlatformSystem
 import com.mitchellbosecke.pebble.PebbleEngine
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
 
 trait TemplateDirective {
