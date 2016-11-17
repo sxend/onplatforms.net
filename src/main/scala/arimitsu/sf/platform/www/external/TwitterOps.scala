@@ -44,8 +44,8 @@ object TwitterOps {
   private val consumerKeySecret = config.getString("consumer-key-secret")
   private def callbackUrl = config.getString("callback-url")
   def newTwitter = {
-    val tw = new TwitterFactory().getInstance()
-    tw.setOAuthConsumer(consumerKey, consumerKeySecret)
-    tw
+    val twitter = new TwitterFactory().getInstance()
+    twitter.setOAuthConsumer(consumerKey, consumerKeySecret)
+    twitter
   }
 }
