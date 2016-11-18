@@ -9,7 +9,7 @@ import arimitsu.sf.platform.lib.directive.TemplateDirective
 import arimitsu.sf.platform.www.directive.AuthenticationDirective
 import arimitsu.sf.platform.www.kvs.Memcached
 import arimitsu.sf.platform.www.router._
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.ExecutionContext
 
@@ -36,9 +36,9 @@ object PlatformSystem {
     import env._
     val route = logRequest("access-log", Logging.InfoLevel) {
       get(path("")(indexRouter.handle)) ~
-      get(path("signup")(signupRouter.handle)) ~
+        get(path("signup")(signupRouter.handle)) ~
         get(path("mypage")(mypageRouter.handle)) // ~
-//        get(path("signout")(signinRouter.signout))
+      //        get(path("signout")(signinRouter.signout))
     }
     Http().bindAndHandle(route, "0.0.0.0", 8080)
   }

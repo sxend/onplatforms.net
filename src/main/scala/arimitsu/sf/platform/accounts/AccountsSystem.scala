@@ -6,11 +6,11 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.accounts.directive.{AuthenticationDirective, TemplateDirective}
+import arimitsu.sf.platform.accounts.directive.{ AuthenticationDirective, TemplateDirective }
 import arimitsu.sf.platform.accounts.external.TwitterOps
 import arimitsu.sf.platform.accounts.kvs.Memcached
 import arimitsu.sf.platform.accounts.router._
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.ExecutionContext
 
@@ -36,7 +36,7 @@ object AccountsSystem {
     import env._
     val route = logRequest("access-log", Logging.InfoLevel) {
       get(path("")(accountsRouter.handle)) ~
-        get(path("signin")(accountsRouter.signup)) ~
+        get(path("signup")(accountsRouter.signup)) ~
         get(path("signin" / "twitter")(accountsRouter.twitterSignin)) ~
         get(path("signin" / "twitter-callback")(accountsRouter.twitterCallback)) ~
         get(path("signout")(accountsRouter.signout))

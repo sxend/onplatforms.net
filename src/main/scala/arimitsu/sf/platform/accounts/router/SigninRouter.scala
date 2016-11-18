@@ -6,15 +6,17 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import arimitsu.sf.platform.accounts.AccountsSystem
 import arimitsu.sf.platform.accounts.external.TwitterOps
 import arimitsu.sf.platform.accounts.directive.Directives._
-import arimitsu.sf.platform.accounts.directive.{AuthenticationDirective, TemplateDirective}
+import arimitsu.sf.platform.accounts.directive.{ AuthenticationDirective, TemplateDirective }
 import arimitsu.sf.platform.accounts.external.TwitterOps
 import arimitsu.sf.platform.accounts.kvs.Memcached
 import twitter4j.Twitter
 
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 class SigninRouter(env: {
   val system: ActorSystem
@@ -27,13 +29,13 @@ class SigninRouter(env: {
   implicit val templateImplicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits
 
-  def handle = parameter("callbackUrl".?) { callbackUrlOpt =>
-    val callbackUrlParam = callbackUrlOpt.map(url => s"?callbackUrl=$url").getOrElse("")
-    redirect(s"/signin$callbackUrlParam", StatusCodes.Found)
+  def handle = parameter("returnTo".?) { returnToOpt =>
+    val returnToParam = returnToOpt.map(url => s"?returnTo=$url").getOrElse("")
+    redirect(s"/signup$returnToParam", StatusCodes.Found)
   }
-  def signup = parameter("callbackUrl".?) { callbackUrlOpt =>
-    val callbackUrlParam = callbackUrlOpt.map(url => s"?callbackUrl=$url").getOrElse("")
-    template("accounts/templates/signup.html", Map("callbackUrlParam" -> callbackUrlParam)) {
+  def signup = parameter("returnTo".?) { returnToOpt =>
+    val returnToParam = returnToOpt.map(url => s"?returnTo=$url").getOrElse("")
+    template("accounts/templates/signup.html", Map("returnTo" -> returnToParam)) {
       case Success(html) => complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, html))
       case _             => reject
     }
@@ -41,10 +43,11 @@ class SigninRouter(env: {
 
   def signout = invalidateSession(redirect("/", StatusCodes.Found))
 
-  private def succeedSignIn(userId: String) =
+  private def succeedSignIn(userId: String, returnToOpt: Option[String] = None) =
     newSession { session =>
       persistSession(session ++ Map("userId" -> userId)) {
-        redirect("/mypage", StatusCodes.Found)
+        val url = returnToOpt.getOrElse("/mypage")
+        redirect(url, StatusCodes.Found)
       }
     }
   private def failedSignIn(t: Throwable): Route = {
@@ -56,21 +59,20 @@ class SigninRouter(env: {
 
   def twitterCallback = TwitterSignin.callback
 
-  private def registerUser(name: String)(f: Try[String] => Route) = {
+  private def registerUser(name: String) = {
     val userId = UUID.randomUUID().toString
-    onComplete(env.memcached.client.set(userId, name, Int.MaxValue.seconds)) {
-      case Success(_) => f(Success(userId))
-      case Failure(t) => f(Failure(t))
-    }
+    env.memcached.client.set(userId, name, Int.MaxValue.seconds).map(_ => userId)(env.system.dispatcher)
   }
 
   object TwitterSignin {
+    private val config = AccountsSystem.getConfigInNamespace("external.twitter")
+    private val signinCallbackUrl = config.getString("callback-url")
     def signin = {
-      parameter("callbackUrl".?) { callbackUrlOpt =>
-        val callbackUrl = callbackUrlOpt.getOrElse("")
+      parameter("returnTo".?) { returnToOpt =>
+        val returnTo = returnToOpt.getOrElse("")
         getOrNewSession { session =>
           implicit val twitter = TwitterOps.newTwitter
-          onComplete(env.twitter.getAuthenticationURL(callbackUrl)) {
+          onComplete(env.twitter.getAuthenticationURL(signinCallbackUrl + s"?returnTo=$returnTo")) {
             case Success(url) =>
               val route = redirect(url, StatusCodes.Found)
               persistSession(session ++ Map("twitter" -> twitter))(route)
@@ -80,18 +82,19 @@ class SigninRouter(env: {
       }
     }
     def callback = {
-      parameter("callbackUrl".?) { callbackUrlOpt =>
-        val callbackUrl = callbackUrlOpt.getOrElse("")
+      parameters("oauth_token", "oauth_verifier", "returnTo".?) { (oauthToken, oauthVerifier, returnToOpt) =>
         requireValidSession { session =>
           session.get("twitter").filter(_.isInstanceOf[Twitter]).map(_.asInstanceOf[Twitter]) match {
             case Some(tw: Twitter) =>
+              import env.system.dispatcher
               implicit val twitter = tw
-              parameters("oauth_token", "oauth_verifier") { (oauthToken, oauthVerifier) =>
-                onComplete(env.twitter.verify(oauthVerifier)) {
-                  case Success((twitterUserId, twitterUserName)) =>
-                    TwitterSignin.register(twitterUserId, twitterUserName)
-                  case Failure(t) => failedSignIn(t)
-                }
+              val userIdF = for {
+                (twitterUserId, twitterUserName) <- env.twitter.verify(oauthVerifier)
+                userId <- TwitterSignin.register(twitterUserId, twitterUserName)
+              } yield userId
+              onComplete(userIdF) {
+                case Success(userId) => succeedSignIn(userId, returnToOpt)
+                case Failure(t)      => failedSignIn(t)
               }
             case _ => reject
           }
@@ -100,25 +103,14 @@ class SigninRouter(env: {
       }
     }
 
-    private def register(twitterUserId: String, twitterUserName: String) =
-      onComplete(env.twitter.findUser(twitterUserId))(onFindUser(twitterUserId, twitterUserName))
-
-    private def onFindUser(twitterUserId: String, twitterUserName: String): Try[Option[String]] => Route = {
-      case Success(Some(userId)) =>
-        succeedSignIn(userId)
-      case Success(None) =>
-        registerUser(twitterUserName)(onRegister(twitterUserId))
-      case Failure(t) => failedSignIn(t)
-    }
-    private def onRegister(twitterUserId: String): Try[String] => Route = {
-      case Success(userId) => mappingUser(twitterUserId, userId)(succeedSignIn(userId))
-      case Failure(t)      => failedSignIn(t)
-    }
-    private def mappingUser(twitterUserId: String, userId: String)(route: Route) = {
-      onComplete(env.twitter.mappingUser(twitterUserId, userId)) {
-        case Success(_) => route
-        case Failure(t) => failedSignIn(t)
+    private def register(twitterUserId: String, twitterUserName: String)(implicit ec: ExecutionContext): Future[String] =
+      env.twitter.findUser(twitterUserId).flatMap {
+        case Some(userId) => Future(userId)(env.system.dispatcher)
+        case None         => registerUser(twitterUserName).flatMap(mappingUser(twitterUserId, _))
       }
+
+    private def mappingUser(twitterUserId: String, userId: String)(implicit ec: ExecutionContext) = {
+      env.twitter.mappingUser(twitterUserId, userId).map(_ => userId)
     }
   }
 }
