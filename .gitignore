@@ -13,3 +13,4 @@ node_modules/
 dist/
 .ensime
 .ensime_cache/
+npm-debug.log
