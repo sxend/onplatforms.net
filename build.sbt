@@ -70,5 +70,3 @@ testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/Sc
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/ScalaTest-reports/unit")
 
 assemblyJarName in assembly := s"platform.jar"
-
-mainClass in assembly := Some("arimitsu.sf.platform.Bootstrap")

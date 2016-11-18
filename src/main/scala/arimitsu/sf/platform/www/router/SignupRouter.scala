@@ -21,9 +21,14 @@ class SignupRouter(env: {
 }) {
 
   def handle = getCallbackUrl { callbackUrl =>
-    redirect(s"http://accounts.arimit.su:8081?returnTo=$callbackUrl", StatusCodes.Found)
+    redirect(s"https://accounts.arimit.su/sign?returnTo=$callbackUrl", StatusCodes.Found)
   }
-
+  def getSignupUrl(returnTo: Option[String]) = {
+    val returnToParam = returnTo.map(x => s"&returnTo=$x").getOrElse("")
+    s"https://accounts.arimit.su/api/signup?consumer_key=xxxx&consumer_key_secret=xxxx_sec$returnToParam"
+    // =>
+    s"https://accounts.arimit.su/signup?verifier=xxxxxxx&nonce=xxxxx"
+  }
   def getCallbackUrl(route: String => Route) =
     onComplete(Future("http://www.arimit.su:8080")(env.blockingContext)) {
       case Success(callbackUrl) => route(callbackUrl)

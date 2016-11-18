@@ -37,9 +37,9 @@ object PlatformSystem {
     val route = logRequest("access-log", Logging.InfoLevel) {
       get(path("")(indexRouter.handle)) ~
         get(path("signup")(signupRouter.handle)) ~
-        get(path("mypage")(mypageRouter.handle)) // ~
-      //        get(path("signout")(signinRouter.signout))
+        get(path("mypage")(mypageRouter.handle))
     }
-    Http().bindAndHandle(route, "0.0.0.0", 8080)
+    val platformConfig = getConfigInNamespace("system")
+    Http().bindAndHandle(route, platformConfig.getString("listen-address"), platformConfig.getInt("listen-port"))
   }
 }

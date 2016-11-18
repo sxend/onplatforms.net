@@ -2,4 +2,4 @@
 
 sudo -u memcache memcached -d
 
-java -jar /opt/platform.jar
+java -cp /opt/platform.jar $1
