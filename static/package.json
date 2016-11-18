@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config ./webpack.config.js"
+    "build": "parallel-webpack --help"
+
   },
   "author": "sxend",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "vue": "^2.0.7"
   },
   "devDependencies": {
+    "parallel-webpack": "^1.5.0",
     "ts-loader": "^1.2.1",
     "typescript": "^2.0.10",
     "webpack": "^1.13.3"
