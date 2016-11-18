@@ -2,11 +2,10 @@
   "name": "static.platform.arimit.su",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parallel-webpack --help"
-
+    "build": "parallel-webpack",
+    "build-w": "parallel-webpack --watch"
   },
   "author": "sxend",
   "license": "ISC",
@@ -15,6 +14,7 @@
     "vue": "^2.0.7"
   },
   "devDependencies": {
+    "css-loader": "^0.26.0",
     "parallel-webpack": "^1.5.0",
     "ts-loader": "^1.2.1",
     "typescript": "^2.0.10",
