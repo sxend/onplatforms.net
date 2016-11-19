@@ -2,14 +2,16 @@ package arimitsu.sf.platform.accounts
 
 import akka.actor.ActorSystem
 import akka.event.Logging
+import akka.event.Logging._
 import akka.http.scaladsl._
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.accounts.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.AuthenticationDirective
 import arimitsu.sf.platform.accounts.external.TwitterOps
-import arimitsu.sf.platform.accounts.kvs.Memcached
+import arimitsu.sf.platform.lib.kvs.Memcached
 import arimitsu.sf.platform.accounts.router._
+import arimitsu.sf.platform.lib.directive.TemplateDirective
 import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.ExecutionContext
@@ -22,6 +24,8 @@ object AccountsSystem {
   def main(args: Array[String]): Unit = {
     val env = new {
       val config: Config = AccountsSystem.config
+      val namespace: String = AccountsSystem.namespace
+      val version: String = "latest"
       implicit val system = ActorSystem("platform-system", this.config)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
@@ -29,18 +33,22 @@ object AccountsSystem {
       val logger = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
-      val accountsRouter = new SigninRouter(this)
+      val signupRouter = new SignupRouter(this)
+      val indexRouter = new IndexRouter(this)
+      val _indexRouter = new IndexRouter(this)
       val memcached = new Memcached(this)
       val twitter = new TwitterOps(this)
     }
     import env._
-    val route = logRequest("access-log", Logging.InfoLevel) {
-      get(path("")(accountsRouter.handle)) ~
-        get(path("signup")(accountsRouter.signup)) ~
-        get(path("signin" / "twitter")(accountsRouter.twitterSignin)) ~
-        get(path("signin" / "twitter-callback")(accountsRouter.twitterCallback)) ~
-        get(path("signout")(accountsRouter.signout))
-    }
+    val mapping = Seq(
+      get(path("")(indexRouter.handle)),
+      get(path("signup")(signupRouter.handle)),
+      get(path("signin" / "twitter")(signupRouter.twitterSignin)),
+      get(path("signin" / "twitter-callback")(signupRouter.twitterCallback)),
+      get(path("signout")(signupRouter.signout))
+    ).foldLeft(get(Directives.reject))(_ ~ _)
+
+    val route = logRequest("access-log", InfoLevel)(mapping)
     val accountsConfig = getConfigInNamespace("system")
     Http().bindAndHandle(route, accountsConfig.getString("listen-address"), accountsConfig.getInt("listen-port"))
   }

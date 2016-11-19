@@ -1,16 +1,16 @@
-package arimitsu.sf.platform.accounts.kvs
+package arimitsu.sf.platform.lib.kvs
 
-import akka.actor.ActorSystem
-import arimitsu.sf.platform.accounts.AccountsSystem
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.Config
 import shade.memcached.{ Configuration, Memcached => Shade }
 
 import scala.concurrent.ExecutionContext
 
 class Memcached(env: {
   val blockingContext: ExecutionContext
+  val config: Config
+  val namespace: String
 }) {
-  private val config = AccountsSystem.getConfigInNamespace("kvs.memcached")
+  private val config = env.config.getConfig(s"${env.namespace}.kvs.memcached")
   private val host = config.getString("host")
   private val port = config.getInt("port")
   val client = Shade(Configuration(s"$host:$port"))(env.blockingContext)

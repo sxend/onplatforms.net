@@ -6,11 +6,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import arimitsu.sf.platform.accounts.directive.Directives._
-import arimitsu.sf.platform.accounts.directive.{ AuthenticationDirective, TemplateDirective }
-import arimitsu.sf.platform.accounts.external.TwitterOps
-import arimitsu.sf.platform.accounts.kvs.Memcached
-import twitter4j.Twitter
+import arimitsu.sf.platform.lib.directive.Directives._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._

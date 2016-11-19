@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.accounts.directive
+package arimitsu.sf.platform.lib.directive
 
 trait Directives extends AnyRef
     with TemplateDirective

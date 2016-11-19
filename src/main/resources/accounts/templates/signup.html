@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>signup - Platform Accounts</title>
+    <title>Platform[accounts]</title>
+    <script async="async" src="https://cdn.arimit.su/platform/{{version}}/accounts/platform.min.js"></script>
 </head>
-<body>
-<p>Signup</p>
-<form method="post" action="/signup{{returnTo}}">
-    <input type="text" name="name"/>
-    <input type="password" name="password">
-    <input type="password" name="password_confirm">
-</form>
-<p>Signin With...</p>
-<p><a href="/signin/twitter{{returnTo}}">with twitter</a></p>
+<body id="main-content" class="container">
+<div>
+    <p><a href="/signin/twitter{{returnTo}}">Twitterでログイン</a></p>
+</div>
 </body>
 </html>

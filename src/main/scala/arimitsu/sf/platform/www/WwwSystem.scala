@@ -1,26 +1,28 @@
 package arimitsu.sf.platform.www
 
 import akka.actor.ActorSystem
-import akka.event.Logging
+import akka.event.Logging._
 import akka.http.scaladsl._
+import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.lib.directive.TemplateDirective
-import arimitsu.sf.platform.www.directive.AuthenticationDirective
-import arimitsu.sf.platform.www.kvs.Memcached
+import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.kvs.Memcached
 import arimitsu.sf.platform.www.router._
 import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.ExecutionContext
 
-object PlatformSystem {
+object WwwSystem {
   val config: Config = ConfigFactory.load
   val namespace = "arimitsu.sf.platform.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
   def getConfigInNamespace(suffix: String) = config.getConfig(withNamespace(suffix))
   def main(args: Array[String]): Unit = {
     val env = new {
-      val config: Config = PlatformSystem.config
+      val config: Config = WwwSystem.config
+      val namespace: String = WwwSystem.namespace
+      val version: String = "latest"
       implicit val system = ActorSystem("platform-system", this.config)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
@@ -34,12 +36,15 @@ object PlatformSystem {
       val memcached = new Memcached(this)
     }
     import env._
-    val route = logRequest("access-log", Logging.InfoLevel) {
-      get(path("")(indexRouter.handle)) ~
-        get(path("signup")(signupRouter.handle)) ~
-        get(path("mypage")(mypageRouter.handle))
-    }
-    val platformConfig = getConfigInNamespace("system")
-    Http().bindAndHandle(route, platformConfig.getString("listen-address"), platformConfig.getInt("listen-port"))
+
+    val mapping = Seq(
+      get(path("")(indexRouter.handle)),
+      get(path("signup")(signupRouter.handle)),
+      get(path("mypage")(mypageRouter.handle))
+    ).foldLeft(get(Directives.reject))(_ ~ _)
+
+    val route = logRequest("access-log", InfoLevel)(mapping)
+    val wwwConfig = getConfigInNamespace("system")
+    Http().bindAndHandle(route, wwwConfig.getString("listen-address"), wwwConfig.getInt("listen-port"))
   }
 }

@@ -1,4 +1,4 @@
-package arimitsu.sf.platform.www.directive
+package arimitsu.sf.platform.lib.directive
 
 import java.util.UUID
 
@@ -7,16 +7,13 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import arimitsu.sf.platform.www.kvs.Memcached
-import com.typesafe.config.{ Config, ConfigFactory }
-
-import scala.concurrent.duration._
-import scala.util.{ Failure, Success }
-import Directives._
-import arimitsu.sf.platform.www.PlatformSystem
+import arimitsu.sf.platform.lib.kvs.Memcached
+import com.typesafe.config.Config
 import org.apache.commons.lang3.SerializationUtils
 
+import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 trait AuthenticationDirective {
   import AuthenticationDirective._
   def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits) = {
@@ -33,7 +30,7 @@ trait AuthenticationDirective {
     }
   }
   def requireValidSession(f: => Session => Route)(implicit implicits: Implicits) =
-    optionalCookie(cookieKey) {
+    optionalCookie(implicits.cookieKey) {
       case Some(pair) =>
         onComplete(getFromMemcache(pair.value)) {
           case Success(Some(bytes)) => onDeserialize(bytes)(f)
@@ -43,7 +40,7 @@ trait AuthenticationDirective {
       case _ => reject
     }
   def getOrNewSession(f: => Session => Route)(implicit implicits: Implicits) = {
-    optionalCookie(cookieKey) {
+    optionalCookie(implicits.cookieKey) {
       case Some(pair) =>
         onComplete(getFromMemcache(pair.value)) {
           case Success(Some(bytes)) => onDeserialize(bytes)(f, _ => newSession(f))
@@ -53,6 +50,7 @@ trait AuthenticationDirective {
     }
   }
   def newSession(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) = {
+    import implicits._
     val newSessionId = UUID.randomUUID().toString
     val newSession: Session = Map(cookieKey -> newSessionId)
     onSerialize(newSession) { bytes =>
@@ -71,11 +69,11 @@ trait AuthenticationDirective {
   def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits) = newSession(route)
 
   def invalidateSession(route: Route)(implicit implicits: Implicits) =
-    deleteCookie(cookieKey, path = path, domain = domain)(route)
+    deleteCookie(implicits.cookieKey, path = implicits.path, domain = implicits.domain)(route)
 
   def persistSession(newSession: Session)(route: Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onSerialize(newSession) { bytes =>
-      onComplete(setToMemcache(newSession(cookieKey).toString, bytes)) {
+      onComplete(setToMemcache(newSession(implicits.cookieKey).toString, bytes)) {
         case Success(_) => route
         case Failure(t) => onFail(t)
       }
@@ -107,16 +105,19 @@ object AuthenticationDirective extends AuthenticationDirective {
   import net.ceedubs.ficus.Ficus._
   type Session = Map[String, Any]
   type OnFail = Throwable => Route
-  private val config = PlatformSystem.getConfigInNamespace("directives.authentication")
-  private val sessionConfig = config.getConfig("session")
-  val cookieKey = sessionConfig.getString("cookie.key")
-  val maxAge = sessionConfig.as[FiniteDuration]("cookie.max-age").toSeconds
-  val path = sessionConfig.getString("cookie.path")
-  val domain = sessionConfig.getString("cookie.domain")
+
   case class Implicits(env: {
     val memcached: Memcached
     val logger: LoggingAdapter
     val blockingContext: ExecutionContext
+    val config: Config
+    val namespace: String
   }) {
+    private val config = env.config.getConfig(s"${env.namespace}.directives.authentication")
+    private val sessionConfig = config.getConfig("session")
+    val cookieKey = sessionConfig.getString("cookie.key")
+    val maxAge = sessionConfig.as[FiniteDuration]("cookie.max-age").toSeconds
+    val path = sessionConfig.getString("cookie.path")
+    val domain = sessionConfig.getString("cookie.domain")
   }
 }

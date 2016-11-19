@@ -8,22 +8,24 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.accounts.AccountsSystem
 import arimitsu.sf.platform.accounts.external.TwitterOps
-import arimitsu.sf.platform.accounts.directive.Directives._
-import arimitsu.sf.platform.accounts.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.Directives._
+import arimitsu.sf.platform.lib.directive.AuthenticationDirective
+import arimitsu.sf.platform.lib.directive.TemplateDirective
 import arimitsu.sf.platform.accounts.external.TwitterOps
-import arimitsu.sf.platform.accounts.kvs.Memcached
+import arimitsu.sf.platform.lib.kvs.Memcached
 import twitter4j.Twitter
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
 
-class SigninRouter(env: {
+class SignupRouter(env: {
   val system: ActorSystem
   val templateDirectiveImplicits: TemplateDirective.Implicits
   val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
   val memcached: Memcached
   val twitter: TwitterOps
+  val version: String
 }) {
 
   implicit val templateImplicits = env.templateDirectiveImplicits
@@ -31,11 +33,7 @@ class SigninRouter(env: {
 
   def handle = parameter("returnTo".?) { returnToOpt =>
     val returnToParam = returnToOpt.map(url => s"?returnTo=$url").getOrElse("")
-    redirect(s"/signup$returnToParam", StatusCodes.Found)
-  }
-  def signup = parameter("returnTo".?) { returnToOpt =>
-    val returnToParam = returnToOpt.map(url => s"?returnTo=$url").getOrElse("")
-    template("accounts/templates/signup.html", Map("returnTo" -> returnToParam)) {
+    template("accounts/templates/signup.html", Map("returnToParam" -> returnToParam, "version" -> env.version)) {
       case Success(html) => complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, html))
       case _             => reject
     }
@@ -115,6 +113,6 @@ class SigninRouter(env: {
   }
 }
 
-object SigninRouter {
+object SignupRouter {
 
 }

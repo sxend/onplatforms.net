@@ -4,9 +4,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.Credentials
-import arimitsu.sf.platform.lib.directive.TemplateDirective
-import arimitsu.sf.platform.www.directive.Directives._
-import arimitsu.sf.platform.www.directive.AuthenticationDirective
+import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.Directives._
 
 import scala.concurrent.Future
 import scala.util.Success

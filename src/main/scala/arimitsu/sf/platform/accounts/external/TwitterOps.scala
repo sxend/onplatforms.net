@@ -4,7 +4,7 @@ import java.io.File
 
 import akka.actor.ActorSystem
 import arimitsu.sf.platform.accounts.AccountsSystem
-import arimitsu.sf.platform.accounts.kvs.Memcached
+import arimitsu.sf.platform.lib.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import twitter4j.{ Twitter, TwitterFactory }
 

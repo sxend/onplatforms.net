@@ -3,22 +3,24 @@ package arimitsu.sf.platform.accounts.router
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import arimitsu.sf.platform.lib.directive.TemplateDirective
-import arimitsu.sf.platform.www.directive.Directives._
+import arimitsu.sf.platform.lib.directive.TemplateDirective._
 
 import scala.util.Success
 
 class IndexRouter(env: {
   val templateDirectiveImplicits: TemplateDirective.Implicits
+  val version: String
 }) {
   implicit val templateImplicits = env.templateDirectiveImplicits
 
-  def handle = parameter("callbackUrl".?) { callbackUrlOpt =>
-    val callbackUrlParam = callbackUrlOpt.map(url => s"?callbackUrl=$url").getOrElse("")
-    template("www/templates/index.html", Map("callbackUrlParam" -> callbackUrlParam)) {
+  def handle = parameter("returnTo".?) { returnToOpt =>
+    val returnToParam = returnToOpt.map(url => s"?returnTo=$url").getOrElse("")
+    template("accounts/templates/index.html", Map("returnToParam" -> returnToParam, "version" -> env.version)) {
       case Success(html) => complete(htmlEntity(html))
       case _             => reject
     }
   }
+
   private def htmlEntity(html: String) =
     HttpEntity(ContentTypes.`text/html(UTF-8)`, html)
 }
