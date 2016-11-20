@@ -18,7 +18,6 @@ export function app(platform) {
   const router = platform.router = new VueRouter({
     routes: routes
   });
-  window.data = platform.rootData;
   const vm = platform.rootVM = new Vue({
     router: router,
     template: '<div class="container"><router-view></router-view></div>'
