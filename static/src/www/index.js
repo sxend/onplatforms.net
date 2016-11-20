@@ -7,7 +7,7 @@ Vue.use(VueRouter);
 
 import {app} from './app';
 
-export const platform = {
+const platform = {
   Vue: Vue,
   VueRouter: VueRouter,
   Skeleton: Skeleton,

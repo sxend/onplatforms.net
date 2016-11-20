@@ -21,5 +21,5 @@ export function app(platform) {
     router: router,
     template: '<div class="container"><router-view></router-view></div>'
   }).$mount('#main-contents');
-  router.push("/");
+
 }
