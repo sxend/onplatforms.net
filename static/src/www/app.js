@@ -2,6 +2,7 @@
 
 import pages from './pages';
 import components from './components';
+import styles from './styles/index.scss';
 
 export function app(platform) {
   const Vue = platform.Vue;

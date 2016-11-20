@@ -26,7 +26,8 @@ module.exports = {
           { test: /\.html$/, loader: "html-loader" },
           { test: /\.css$/, loader: "style-loader!css-loader" },
           { test: /\.png$/, loader: "url-loader?limit=100000" },
-          { test: /\.jpg$/, loader: "file-loader" }
+          { test: /\.jpg$/, loader: "file-loader" },
+          { test: /\.scss$/, loaders: ["style", "css", "sass"] }
         ]
       },
       plugins: [new webpack.optimize.UglifyJsPlugin({
