@@ -7,6 +7,11 @@ export default function(platform) {
         pageArea: platform.rootData.pageArea ?  " - " + platform.rootData.pageArea : ""
       })
     },
+    methods: {
+      gotoTop: function() {
+        platform.router.push("/");
+      }
+    },
     template: template
   });
 }
