@@ -6,8 +6,6 @@ import {app} from './app';
 
 Vue.use(VueRouter);
 
-
-
 const platform = {
   Vue: Vue,
   VueRouter: VueRouter,
