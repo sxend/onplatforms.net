@@ -1,6 +1,14 @@
 
-import template from "../templates/index.html";
+import links from './links';
+import header from './header';
+
+const components = [
+  links, header
+];
 
 export default {
-  template: template
-};
+  components: components,
+  init: function(platform) {
+    components.forEach(component => component(platform));
+  }
+}
