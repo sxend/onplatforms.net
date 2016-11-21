@@ -1,13 +1,10 @@
 package arimitsu.sf.platform.www.router
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.directives.Credentials
-import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
 import arimitsu.sf.platform.lib.directive.Directives._
+import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
 
-import scala.concurrent.Future
 import scala.util.Success
 
 class MypageRouter(env: {

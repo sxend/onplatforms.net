@@ -8,15 +8,14 @@ import arimitsu.sf.platform.lib.kvs.Memcached
 import com.typesafe.config.ConfigFactory
 import twitter4j.{ Twitter, TwitterFactory }
 
-import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
+import scala.concurrent.{ ExecutionContext, Future }
 
 class TwitterOps(env: {
   val system: ActorSystem
   val memcached: Memcached
   val blockingContext: ExecutionContext
 }) {
-  import TwitterOps._
   def getAuthenticationURL(callbackUrl: String)(implicit twitter: Twitter): Future[String] =
     Future {
       twitter.getOAuthRequestToken(callbackUrl).getAuthenticationURL

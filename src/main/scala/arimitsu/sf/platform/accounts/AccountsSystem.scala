@@ -1,17 +1,15 @@
 package arimitsu.sf.platform.accounts
 
 import akka.actor.ActorSystem
-import akka.event.Logging
 import akka.event.Logging._
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.lib.directive.AuthenticationDirective
 import arimitsu.sf.platform.accounts.external.TwitterOps
-import arimitsu.sf.platform.lib.kvs.Memcached
 import arimitsu.sf.platform.accounts.router._
-import arimitsu.sf.platform.lib.directive.TemplateDirective
+import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.kvs.Memcached
 import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.ExecutionContext

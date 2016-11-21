@@ -15,8 +15,6 @@ import scala.util.Try
 
 trait TemplateDirective {
 
-  import TemplateDirective._
-
   def template(resourceName: String, attributes: Map[String, Any] = Map.empty)(f: Try[String] => Route)(implicit implicits: TemplateDirective.Implicits) =
     onComplete(Future {
       import scala.collection.JavaConverters._

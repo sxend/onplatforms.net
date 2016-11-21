@@ -1,16 +1,11 @@
 package arimitsu.sf.platform.www.router
 
-import java.util.UUID
-
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import arimitsu.sf.platform.lib.directive.Directives._
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.concurrent.duration._
-import scala.util.{ Failure, Success, Try }
+import scala.util.Success
 
 class SignupRouter(env: {
   val blockingContext: ExecutionContext
