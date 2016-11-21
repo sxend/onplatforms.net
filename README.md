@@ -3,7 +3,7 @@ Platform
 
 ### prepare
 
-`sudo docker run -p 11212:11211 -d memcached:alpine`
+`sudo docker run -p 11211:11211 -p 11212:11211 -d memcached:alpine`
 
 ### build
 
