@@ -39,7 +39,7 @@ object WwwSystem {
 
     val mapping = Seq(
       get(path("")(indexRouter.handle)),
-      get(path("signup")(signupRouter.handle)),
+      post(path("signup")(signupRouter.handle)),
       get(path("mypage")(mypageRouter.handle))
     ).foldLeft(get(Directives.reject))(_ ~ _)
 

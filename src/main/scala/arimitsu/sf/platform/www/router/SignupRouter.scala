@@ -2,24 +2,27 @@ package arimitsu.sf.platform.www.router
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
+import spray.json.DefaultJsonProtocol._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.marshalling.ToResponseMarshaller
+import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Success
+import spray.json._
+import scala.concurrent.ExecutionContext
 
 class SignupRouter(env: {
   val blockingContext: ExecutionContext
 }) {
-
-  def handle = getCallbackUrl { callbackUrl =>
-    redirect(s"https://accounts.arimit.su/signup?returnTo=$callbackUrl", StatusCodes.Found)
+  def handle = parameter('returnTo.?) { (returnToOpt) =>
+    val returnTo = returnToOpt.getOrElse("https://www.arimit.su")
+    redirect(s"https://accounts.arimit.su/signup?returnTo=$returnTo", StatusCodes.Found)
   }
+//  def handle0 = entity(as[String]) { (paramOpt) =>
+//    val param = paramOpt.flatMap(_.split("=").tail.headOption).map(_.parseJson.convertTo[SignupParam])
+//    val returnTo = paramOpt.
 
-  def getCallbackUrl(route: String => Route) =
-    onComplete(Future("https://www.arimit.su")(env.blockingContext)) {
-      case Success(callbackUrl) => route(callbackUrl)
-      case _                    => reject
-    }
+//  }
+
 }
 
 object SignupRouter {
