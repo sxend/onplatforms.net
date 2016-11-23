@@ -9,9 +9,9 @@ import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDir
 import scala.util.Success
 
 class MypageRouter(env: {
-  val templateDirectiveImplicits: TemplateDirective.Implicits
-  val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
-}) {
+                     val templateDirectiveImplicits: TemplateDirective.Implicits
+                     val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
+                   }) {
   implicit val templateImplicits: TemplateDirective.Implicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits: AuthenticationDirective.Implicits = env.authenticationDirectiveImplicits
 

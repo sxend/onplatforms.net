@@ -18,13 +18,13 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
 class SignupRouter(env: {
-  val system: ActorSystem
-  val templateDirectiveImplicits: TemplateDirective.Implicits
-  val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
-  val memcached: Memcached
-  val twitter: TwitterOps
-  val version: String
-}) {
+                     val system: ActorSystem
+                     val templateDirectiveImplicits: TemplateDirective.Implicits
+                     val authenticationDirectiveImplicits: AuthenticationDirective.Implicits
+                     val memcached: Memcached
+                     val twitter: TwitterOps
+                     val version: String
+                   }) {
 
   implicit val templateImplicits = env.templateDirectiveImplicits
   implicit val authenticationImplicits = env.authenticationDirectiveImplicits

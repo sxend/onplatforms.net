@@ -12,10 +12,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
 class TwitterOps(env: {
-  val system: ActorSystem
-  val memcached: Memcached
-  val blockingContext: ExecutionContext
-}) {
+                   val system: ActorSystem
+                   val memcached: Memcached
+                   val blockingContext: ExecutionContext
+                 }) {
   def getAuthenticationURL(callbackUrl: String)(implicit twitter: Twitter): Future[String] =
     Future {
       twitter.getOAuthRequestToken(callbackUrl).getAuthenticationURL

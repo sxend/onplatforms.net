@@ -8,9 +8,9 @@ import arimitsu.sf.platform.lib.directive.TemplateDirective._
 import scala.util.Success
 
 class IndexRouter(env: {
-  val templateDirectiveImplicits: TemplateDirective.Implicits
-  val version: String
-}) {
+                    val templateDirectiveImplicits: TemplateDirective.Implicits
+                    val version: String
+                  }) {
   implicit val templateImplicits = env.templateDirectiveImplicits
 
   def handle = parameter("returnTo".?) { returnToOpt =>

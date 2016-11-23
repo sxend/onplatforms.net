@@ -11,8 +11,7 @@ import spray.json._
 import scala.concurrent.ExecutionContext
 
 class SignupRouter(env: {
-  val blockingContext: ExecutionContext
-}) {
+                   }) {
   def handle = parameter('returnTo.?) { (returnToOpt) =>
     val returnTo = returnToOpt.getOrElse("https://www.arimit.su")
     redirect(s"https://accounts.arimit.su/signup?returnTo=$returnTo", StatusCodes.Found)

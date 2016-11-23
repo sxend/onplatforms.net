@@ -2,6 +2,7 @@ package arimitsu.sf.platform.www
 
 import akka.actor.ActorSystem
 import akka.event.Logging._
+import akka.event.LoggingAdapter
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
@@ -17,7 +18,7 @@ object WwwSystem {
   val config: Config = ConfigFactory.load
   val namespace = "arimitsu.sf.platform.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
-  def getConfigInNamespace(suffix: String) = config.getConfig(withNamespace(suffix))
+  def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
   def main(args: Array[String]): Unit = {
     val env = new {
       val config: Config = WwwSystem.config
@@ -27,7 +28,7 @@ object WwwSystem {
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
-      val logger = system.log
+      val logger: LoggingAdapter = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
       val indexRouter = new IndexRouter(this)

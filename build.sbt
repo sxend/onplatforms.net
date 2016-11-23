@@ -36,7 +36,8 @@ libraryDependencies ++= {
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "org.specs2" %% "specs2-html" % spec2Version % "test",
     "org.specs2" %% "specs2-junit" % spec2Version % "test",
-    "org.specs2" %% "specs2-core" % spec2Version % "test"
+    "org.specs2" %% "specs2-core" % spec2Version % "test",
+    "org.scalariform" %% "scalariform" % "0.1.8" % "compile"
   )
 }
 

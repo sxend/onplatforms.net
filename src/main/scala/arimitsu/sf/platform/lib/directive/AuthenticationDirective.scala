@@ -57,7 +57,7 @@ trait AuthenticationDirective {
       onComplete(setToMemcache(newSessionId, bytes)) {
         case Success(_) => setCookie(HttpCookie(cookieKey, newSessionId,
           maxAge = Some(maxAge),
-          path = Some(path),
+          path   = Some(path),
           domain = Some(domain))) {
           f(newSession)
         }
@@ -107,12 +107,12 @@ object AuthenticationDirective extends AuthenticationDirective {
   type OnFail = Throwable => Route
 
   case class Implicits(env: {
-    val memcached: Memcached
-    val logger: LoggingAdapter
-    val blockingContext: ExecutionContext
-    val config: Config
-    val namespace: String
-  }) {
+                         val memcached: Memcached
+                         val logger: LoggingAdapter
+                         val blockingContext: ExecutionContext
+                         val config: Config
+                         val namespace: String
+                       }) {
     private val config = env.config.getConfig(s"${env.namespace}.directives.authentication")
     private val sessionConfig = config.getConfig("session")
     val cookieKey = sessionConfig.getString("cookie.key")
