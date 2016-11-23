@@ -3,8 +3,8 @@ package arimitsu.sf.platform.www
 import akka.actor.ActorSystem
 import akka.event.Logging._
 import akka.http.scaladsl._
-import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
 import arimitsu.sf.platform.lib.kvs.Memcached
@@ -41,7 +41,7 @@ object WwwSystem {
       get(path("")(indexRouter.handle)),
       post(path("signup")(signupRouter.handle)),
       get(path("mypage")(mypageRouter.handle))
-    ).foldLeft(get(Directives.reject))(_ ~ _)
+    ).foldLeft[Route](reject)(_ ~ _)
 
     val route = logRequest("access-log", InfoLevel)(mapping)
     val wwwConfig = getConfigInNamespace("system")
