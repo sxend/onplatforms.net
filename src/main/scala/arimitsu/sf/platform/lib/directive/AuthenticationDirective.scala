@@ -16,7 +16,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 trait AuthenticationDirective {
   import AuthenticationDirective._
-  def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits) = {
+  def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits): Route = {
     import implicits._
     requireValidSession { session =>
       val userId = session("userId").asInstanceOf[String]
@@ -29,7 +29,7 @@ trait AuthenticationDirective {
       }
     }
   }
-  def requireValidSession(f: => Session => Route)(implicit implicits: Implicits) =
+  def requireValidSession(f: => Session => Route)(implicit implicits: Implicits): Route =
     optionalCookie(implicits.cookieKey) {
       case Some(pair) =>
         onComplete(getFromMemcache(pair.value)) {
@@ -39,7 +39,7 @@ trait AuthenticationDirective {
         }
       case _ => reject
     }
-  def getOrNewSession(f: => Session => Route)(implicit implicits: Implicits) = {
+  def getOrNewSession(f: => Session => Route)(implicit implicits: Implicits): Route = {
     optionalCookie(implicits.cookieKey) {
       case Some(pair) =>
         onComplete(getFromMemcache(pair.value)) {
@@ -49,7 +49,7 @@ trait AuthenticationDirective {
       case _ => newSession(f)
     }
   }
-  def newSession(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) = {
+  def newSession(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits): Route = {
     import implicits._
     val newSessionId = UUID.randomUUID().toString
     val newSession: Session = Map(cookieKey -> newSessionId)
@@ -66,12 +66,13 @@ trait AuthenticationDirective {
     }
   }
 
-  def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits) = newSession(route)
+  def invalidateAndNewSession(route: Session => Route)(implicit implicits: Implicits): Route = newSession(route)
 
-  def invalidateSession(route: Route)(implicit implicits: Implicits) =
+  def invalidateSession(route: Route)(implicit implicits: Implicits): Route =
     deleteCookie(implicits.cookieKey, path = implicits.path, domain = implicits.domain)(route)
 
-  def persistSession(newSession: Session)(route: Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
+  def persistSession(newSession: Session)(
+    route: Route, onFail: => OnFail = failWith)(implicit implicits: Implicits): Route =
     onSerialize(newSession) { bytes =>
       onComplete(setToMemcache(newSession(implicits.cookieKey).toString, bytes)) {
         case Success(_) => route
