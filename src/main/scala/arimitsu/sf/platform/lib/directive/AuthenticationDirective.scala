@@ -14,6 +14,7 @@ import org.apache.commons.lang3.SerializationUtils
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+
 trait AuthenticationDirective {
   import AuthenticationDirective._
   def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits): Route = {
