@@ -4,7 +4,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.lib.directive.Directives._
-import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.{AuthenticationDirective, TemplateDirective}
 
 import scala.util.Success
 

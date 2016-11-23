@@ -7,10 +7,10 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.{AuthenticationDirective, TemplateDirective}
 import arimitsu.sf.platform.lib.kvs.Memcached
 import arimitsu.sf.platform.www.router._
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContext
 

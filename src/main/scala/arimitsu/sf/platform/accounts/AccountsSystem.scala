@@ -8,9 +8,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import arimitsu.sf.platform.accounts.external.TwitterOps
 import arimitsu.sf.platform.accounts.router._
-import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.{AuthenticationDirective, TemplateDirective}
 import arimitsu.sf.platform.lib.kvs.Memcached
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContext
 

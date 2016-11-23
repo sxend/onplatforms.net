@@ -1,7 +1,7 @@
 package arimitsu.sf.platform.lib.kvs
 
 import com.typesafe.config.Config
-import shade.memcached.{ Configuration, Memcached => Shade }
+import shade.memcached.{Configuration, Memcached => Shade}
 
 import scala.concurrent.ExecutionContext
 

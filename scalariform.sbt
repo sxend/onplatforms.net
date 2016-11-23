@@ -7,3 +7,5 @@ ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(DanglingCloseParenthesis, Preserve)
   .setPreference(AlignArguments, true)
   .setPreference(AlignParameters, true)
+  .setPreference(SpacesAroundMultiImports, false)
+  .setPreference(SpacesWithinPatternBinders, false)

@@ -6,10 +6,10 @@ import akka.actor.ActorSystem
 import arimitsu.sf.platform.accounts.AccountsSystem
 import arimitsu.sf.platform.lib.kvs.Memcached
 import com.typesafe.config.ConfigFactory
-import twitter4j.{ Twitter, TwitterFactory }
+import twitter4j.{Twitter, TwitterFactory}
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class TwitterOps(env: {
                    val system: ActorSystem

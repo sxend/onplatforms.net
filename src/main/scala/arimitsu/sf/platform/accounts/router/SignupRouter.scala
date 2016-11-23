@@ -9,13 +9,13 @@ import akka.http.scaladsl.server.Route
 import arimitsu.sf.platform.accounts.AccountsSystem
 import arimitsu.sf.platform.accounts.external.TwitterOps
 import arimitsu.sf.platform.lib.directive.Directives._
-import arimitsu.sf.platform.lib.directive.{ AuthenticationDirective, TemplateDirective }
+import arimitsu.sf.platform.lib.directive.{AuthenticationDirective, TemplateDirective}
 import arimitsu.sf.platform.lib.kvs.Memcached
 import twitter4j.Twitter
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class SignupRouter(env: {
                      val system: ActorSystem
