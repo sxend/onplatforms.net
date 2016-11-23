@@ -17,11 +17,6 @@ class SignupRouter(env: {
     val returnTo = returnToOpt.getOrElse("https://www.arimit.su")
     redirect(s"https://accounts.arimit.su/signup?returnTo=$returnTo", StatusCodes.Found)
   }
-//  def handle0 = entity(as[String]) { (paramOpt) =>
-//    val param = paramOpt.flatMap(_.split("=").tail.headOption).map(_.parseJson.convertTo[SignupParam])
-//    val returnTo = paramOpt.
-
-//  }
 
 }
 
