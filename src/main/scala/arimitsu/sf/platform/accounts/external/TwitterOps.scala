@@ -12,7 +12,6 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 class TwitterOps(env: {
-                   val system: ActorSystem
                    val memcached: Memcached
                    val blockingContext: ExecutionContext
                  }) {
