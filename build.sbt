@@ -18,6 +18,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   val akkaVersion = "2.4.11"
+  val akkaHttpVersion = "10.0.0"
   val shapelessVersion = "2.3.1"
   val spec2Version = "3.8.4"
   val scalaTestVersion = "2.2.6"
@@ -28,10 +29,10 @@ libraryDependencies ++= {
     "com.mitchellbosecke" % "pebble" % "2.2.3",
     "com.iheart" %% "ficus" % "1.3.2",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-    "com.typesafe.akka" %% "akka-http-core" % akkaVersion,
-    "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion,
-    "com.typesafe.akka" %% "akka-http-experimental" % akkaVersion,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaVersion,
+    "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
+    "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
+    "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+    "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
     "com.chuusai" %% "shapeless" % shapelessVersion,
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "org.specs2" %% "specs2-html" % spec2Version % "test",
