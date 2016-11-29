@@ -1,5 +1,5 @@
 
-organization := "arimitsu.sf"
+organization := "net.onplatforms"
 
 name := "Platform"
 
@@ -10,8 +10,6 @@ scalaVersion := "2.11.8"
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots"),
-  Resolver.bintrayRepo("sxend", "releases"),
-  Resolver.bintrayRepo("sxend", "snapshots"),
   "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/",
   Resolver.bintrayRepo("iheartradio","maven")
 )
