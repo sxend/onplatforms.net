@@ -9,5 +9,5 @@ dependencies:
     - envsubst < .aws/credentials.template > ~/.aws/credentials
     - envsubst < .aws/config.template > ~/.aws/config
   override:
-    - sbt assembly
-    - aws s3 ls s3://internal-storage.onplatforms.net/
+    - sbt "set version := \"b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}\"" assembly
+    - aws s3 cp ./target/scala-2.11/platform.jar s3://internal-storage.onplatforms.net/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
