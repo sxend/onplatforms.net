@@ -1,8 +1,8 @@
-FROM sxend/ubuntu:16.04.3
+FROM sxend/ubuntu:16.04.4
 
 MAINTAINER sxend
 
-RUN sudo apt-get install -y memcached
+RUN apt-get install -y memcached
 
 ADD ./target/scala-2.11/platform.jar /opt/platform.jar
 
