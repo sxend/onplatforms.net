@@ -3,8 +3,8 @@ machine:
     - docker
 dependencies:
   override:
-    - nvm install v0.12.10
-    - nvm use v0.12.10 && npm install
+    - nvm install v6.9.1
+    - nvm alias default v6.9.1
   post:
     - mkdir -p ~/.aws
     - envsubst < .aws/credentials.template > ~/.aws/credentials
