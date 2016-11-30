@@ -13,9 +13,9 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
 
 class RantRouter(env: {
-                    val templateDirectiveImplicits: TemplateDirective.Implicits
-                    val version: String
-                  }) extends SprayJsonSupport with DefaultJsonProtocol {
+                   val templateDirectiveImplicits: TemplateDirective.Implicits
+                   val version: String
+                 }) extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val templateImplicits: Implicits = env.templateDirectiveImplicits
 
   case class Rant(content: String)
@@ -25,7 +25,7 @@ class RantRouter(env: {
 
   def rant: Route = {
     post(path("rant") {
-      entity(as[Rant]) {rant =>
+      entity(as[Rant]) { rant =>
         println(rant)
         complete(StatusCodes.OK)
       }

@@ -19,7 +19,7 @@ class IndexRouter(env: {
   val routes = index
 
   def index: Route = {
-    get(path(""){
+    get(path("") {
       val attributes =
         Map("bootstrap" -> getConfigInNamespace("static").getString("bootstrap-url"))
       template("ranter/templates/index.html", attributes) {

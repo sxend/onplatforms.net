@@ -5,7 +5,7 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 
 class AccountRouter(env: {
-}) {
+                    }) {
   val routes = signup ~ signin ~ signout
 
   def signup: Route = {

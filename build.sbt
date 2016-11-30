@@ -1,7 +1,7 @@
 
 organization := "net.onplatforms"
 
-name := "Platform"
+name := "main"
 
 version := "0.0.1-SNAPSHOT"
 
