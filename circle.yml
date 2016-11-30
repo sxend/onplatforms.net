@@ -1,0 +1,15 @@
+machine:
+  services:
+    - docker
+dependencies:
+  override:
+    - nvm install v0.12.10
+    - nvm use v0.12.10 && npm install
+  post:
+    - mkdir -p ~/.aws
+    - envsubst < .aws/credentials.template > ~/.aws/credentials
+    - envsubst < .aws/config.template > ~/.aws/config
+dependencies:
+  override:
+    - sbt assembly
+    - aws s3 ls s3://internal-storage.onplatforms.net/
