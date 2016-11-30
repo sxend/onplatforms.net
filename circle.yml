@@ -10,4 +10,7 @@ dependencies:
     - envsubst < .aws/config.template > ~/.aws/config
   override:
     - sbt "set version := \"b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}\"" assembly
-    - aws s3 cp ./target/scala-2.11/platform.jar s3://internal-storage.onplatforms.net/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
+    - aws s3 cp ./target/scala-2.11/platform.jar s3://internal-storage.onplatforms.net/jars/all/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
+    - docker build -t b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} -f docker/Dockerfile .
+    - docker save -o container.tar b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
+    - aws s3 cp ./container.tar s3://internal-storage.onplatforms.net/containers/all/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
