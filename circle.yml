@@ -2,14 +2,12 @@ machine:
   services:
     - docker
 dependencies:
-  override:
+  pre:
     - nvm install v6.9.1
     - nvm alias default v6.9.1
-  post:
     - mkdir -p ~/.aws
     - envsubst < .aws/credentials.template > ~/.aws/credentials
     - envsubst < .aws/config.template > ~/.aws/config
-dependencies:
   override:
     - sbt assembly
     - aws s3 ls s3://internal-storage.onplatforms.net/
