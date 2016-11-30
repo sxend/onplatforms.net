@@ -15,7 +15,6 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaVersion = "2.4.11"
   val akkaHttpVersion = "10.0.0"
   val shapelessVersion = "2.3.1"
   val spec2Version = "3.8.4"
@@ -26,7 +25,6 @@ libraryDependencies ++= {
     "org.twitter4j" % "twitter4j-async" % "4.0.5",
     "com.mitchellbosecke" % "pebble" % "2.2.3",
     "com.iheart" %% "ficus" % "1.3.2",
-    "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
