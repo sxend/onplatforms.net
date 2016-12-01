@@ -1,12 +1,11 @@
 {
-  "name": "static.onplatforms.net",
+  "name": "onplatforms.net",
   "version": "1.0.0",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "parallel-webpack",
-    "build-w": "parallel-webpack --watch",
-    "publish": "VERSION=$(git rev-parse HEAD) && aws s3 sync ./dist/ s3://cdn.onplatforms.net/platform/${VERSION}/ && aws s3 sync ./dist/ s3://cdn.onplatforms.net/platform/latest/"
+    "build-w": "parallel-webpack --watch"
   },
   "author": "sxend",
   "license": "ISC",
