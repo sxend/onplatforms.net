@@ -9,7 +9,7 @@ module.exports = {
       entry: './index.tsx',
       output: {
         path: path.join(__dirname, '../', 'dist', name),
-        filename: 'platform.min.js'
+        filename: 'app.js'
       },
       devtool: "source-map",
       resolve: {
