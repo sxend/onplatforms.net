@@ -17,7 +17,7 @@ deployment:
   publish:
     branch: master
     commands:
-      - aws s3 cp ./target/scala-2.11/platform.jar s3://internal-storage.onplatforms.net/zero/jars/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
-      - aws s3 cp ./container.tar s3://internal-storage.onplatforms.net/zero/containers/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
-      - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/static/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/
-      - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/static/latest/
+      - aws s3 cp ./target/scala-2.11/zero.jar s3://internal-storage.onplatforms.net/zero/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/jars/
+      - aws s3 cp ./zero.tar s3://internal-storage.onplatforms.net/zero/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/containers/
+      - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/static/
+      - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/latest/static/
