@@ -19,11 +19,12 @@ object WwwSystem {
   val namespace = "net.onplatforms.platform.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
   def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
+  val wwwConfig = getConfigInNamespace("system")
   def main(args: Array[String]): Unit = {
     val env = new {
       val config: Config = WwwSystem.config
       val namespace: String = WwwSystem.namespace
-      val version: String = "latest"
+      val version: String = wwwConfig.getString("version")
       implicit val system = ActorSystem("platform-system", this.config)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
@@ -45,7 +46,6 @@ object WwwSystem {
     ).foldLeft[Route](reject)(_ ~ _)
 
     val route = logRequest("access-log", InfoLevel)(mapping)
-    val wwwConfig = getConfigInNamespace("system")
     Http().bindAndHandle(route, wwwConfig.getString("listen-address"), wwwConfig.getInt("listen-port"))
   }
 }
