@@ -2,7 +2,7 @@ FROM sxend/ubuntu:16.04.4
 
 MAINTAINER sxend
 
-RUN apt-get install -y memcached
+ARG APP_VERSION=latest
 
 ADD ./target/scala-2.11/platform.jar /opt/platform.jar
 

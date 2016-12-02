@@ -10,7 +10,7 @@ dependencies:
     - envsubst < .aws/config.template > ~/.aws/config
   override:
     - sbt "set version := \"b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}\"" assembly
-    - docker build -t b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} -f docker/Dockerfile .
+    - docker build -t b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} --build-arg APP_VERSION=b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} -f docker/Dockerfile .
     - docker save -o container.tar b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
     - cd static && npm install && npm run build
 deployment:
