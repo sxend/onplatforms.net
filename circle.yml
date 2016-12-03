@@ -3,6 +3,8 @@ machine:
     - docker
 dependencies:
   pre:
+    - docker version
+    - docker info
     - nvm install v6.9.1
     - nvm alias default v6.9.1
     - mkdir -p ~/.aws
