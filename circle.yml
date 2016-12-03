@@ -17,8 +17,8 @@ dependencies:
     - envsubst < .aws/config.template > ~/.aws/config
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
-    - docker build -t ${APP_VERSION} --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
-    - docker save -o zero.tar ${APP_VERSION} && gzip zero.tar
+    - docker build -t onplatforms.net/zero/zero:${APP_VERSION} --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
+    - docker save -o zero.tar onplatforms.net/zero/zero:${APP_VERSION} && gzip zero.tar
     - cd static && npm install && npm run build
 deployment:
   publish:
