@@ -16,7 +16,6 @@ dependencies:
     - sbt "set version := \"b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}\"" assembly
     - docker build -t b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} --build-arg APP_VERSION=b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} -f docker/Dockerfile .
     - docker save -o zero.tar b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} && gzip zero.tar
-    - cd eb && sed -i "s/<APP_VERSION>/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/" Dockerrun.aws.json
     - cd static && npm install && npm run build
 deployment:
   publish:
