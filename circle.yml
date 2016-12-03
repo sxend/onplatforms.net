@@ -13,7 +13,6 @@ dependencies:
     - docker build -t b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} --build-arg APP_VERSION=b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} -f docker/Dockerfile .
     - docker save -o zero.tar b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1} && gzip zero.tar
     - cd eb && sed -i "s/<APP_VERSION>/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/" Dockerrun.aws.json
-    - ./eb/create-eb-version.sh b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
     - cd static && npm install && npm run build
 deployment:
   publish:
@@ -23,3 +22,4 @@ deployment:
       - aws s3 cp ./zero.tar.gz s3://internal-storage.onplatforms.net/zero/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/containers/
       - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}/static/
       - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/latest/static/
+      - ./eb/create-eb-version.sh b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
