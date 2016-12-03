@@ -3,10 +3,13 @@ machine:
     - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   services:
     - docker
+  environment:
+    - APP_VERSION: b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
 dependencies:
   pre:
     - docker version
     - docker info
+    - echo ${APP_VERSION}
     - nvm install v6.9.1
     - nvm alias default v6.9.1
     - mkdir -p ~/.aws
