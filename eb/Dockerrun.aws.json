@@ -1,8 +1,8 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "<APP_VERSION>",
-    "Update": "true"
+    "Name": "zero000",
+    "Update": "false"
   },
   "Ports": [
     {
