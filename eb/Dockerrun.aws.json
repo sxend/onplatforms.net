@@ -1,7 +1,6 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "onplatforms.net/zero/zero:<APP_VERSION>",
     "Update": "false"
   },
   "Ports": [
