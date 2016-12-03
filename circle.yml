@@ -9,6 +9,7 @@ dependencies:
   pre:
     - docker version
     - docker info
+    - docker pull docker-registry.onplatforms.net/ubuntu:16.04
     - echo ${APP_VERSION}
     - nvm install v6.9.1
     - nvm alias default v6.9.1
