@@ -21,14 +21,13 @@ dependencies:
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
     - docker build -t docker-registry.onplatforms.net/zero/zero:${APP_VERSION} --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
-    - docker push docker-registry.onplatforms.net/zero/zero:${APP_VERSION}
     - cd static && npm install && npm run build
 deployment:
   publish:
     branch: master
     commands:
       - aws s3 cp ./target/scala-2.11/zero.jar s3://internal-storage.onplatforms.net/zero/${APP_VERSION}/jars/
-      - aws s3 cp ./zero.tar.gz s3://internal-storage.onplatforms.net/zero/${APP_VERSION}/containers/
+      - docker push docker-registry.onplatforms.net/zero/zero:${APP_VERSION}
       - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/${APP_VERSION}/static/
       - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/latest/static/
       - ./eb/create-eb-version.sh ${APP_VERSION}

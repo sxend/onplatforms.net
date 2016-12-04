@@ -12,5 +12,5 @@
   "Authentication": {
     "Bucket": "internal-storage.onplatforms.net",
     "Key": "/docker/config.json"
-  },
+  }
 }
