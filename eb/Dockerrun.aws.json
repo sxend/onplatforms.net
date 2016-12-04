@@ -1,6 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
+    "Name": "docker-registry.onplatforms.net/zero/zero:<APP_VERSION>",
     "Update": "false"
   },
   "Ports": [
