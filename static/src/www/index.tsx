@@ -1,18 +1,19 @@
 import "./styles/index.scss";
+import "../../node_modules/purecss/build/pure-min.css";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as utils from './utils';
 
-import {Hello} from "./components/Hello";
+import {Main} from "./components/Main";
 
 utils.setViewport('width=device-width,initial-scale=1.0');
 
 ReactDOM.render(
-    <Hello/>,
+    <Main/>,
     document.getElementById("main-contents")
 );
 
 export const platform = {
-    Hello,
+    Main,
 };

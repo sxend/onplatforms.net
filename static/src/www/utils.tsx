@@ -1,7 +1,7 @@
 export function setViewport(content: string) {
     const metalist = document.getElementsByTagName('meta');
     let hasMeta = false;
-    for(var i = 0; i < metalist.length; i++) {
+    for(let i = 0; i < metalist.length; i++) {
         let name = metalist.item(i).getAttribute('name');
         if(name && name.toLowerCase() === 'viewport') {
             metalist.item(i).setAttribute('content', content);
