@@ -7,15 +7,17 @@ machine:
     APP_VERSION: b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
 dependencies:
   pre:
+    - mkdir -p ~/.aws
+    - envsubst < .aws/credentials.template > ~/.aws/credentials
+    - envsubst < .aws/config.template > ~/.aws/config
+    - mkdir -p ~/.docker
+    - aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
     - docker version
     - docker info
     - docker pull docker-registry.onplatforms.net/ubuntu:16.04
     - echo ${APP_VERSION}
     - nvm install v6.9.1
     - nvm alias default v6.9.1
-    - mkdir -p ~/.aws
-    - envsubst < .aws/credentials.template > ~/.aws/credentials
-    - envsubst < .aws/config.template > ~/.aws/config
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
     - docker build -t docker-registry.onplatforms.net/zero/zero:${APP_VERSION} --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
