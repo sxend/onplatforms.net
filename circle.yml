@@ -14,7 +14,6 @@ dependencies:
     - aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
     - docker version
     - docker info
-    - docker pull docker-registry.onplatforms.net/ubuntu:16.04
     - echo ${APP_VERSION}
     - nvm install v6.9.1
     - nvm alias default v6.9.1
