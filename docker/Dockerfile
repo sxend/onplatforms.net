@@ -4,6 +4,8 @@ MAINTAINER sxend
 
 ARG APP_VERSION=latest
 
+ARG APP_PROFILE
+
 ADD ./target/scala-2.11/zero.jar /opt/zero.jar
 
 ADD ./docker/bootstrap.sh /opt/bootstrap.sh

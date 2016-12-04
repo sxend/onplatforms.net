@@ -14,7 +14,7 @@ dependencies:
     - nvm install v6.9.1 && nvm alias default v6.9.1
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
-    - docker build -t docker-registry.onplatforms.net/zero/www:${APP_VERSION} --build-arg PROFILE=www --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
+    - docker build -t docker-registry.onplatforms.net/zero/www:${APP_VERSION} --build-arg APP_PROFILE=www --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
     - cd static && npm install && npm run build
 deployment:
   publish:
