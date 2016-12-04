@@ -14,17 +14,17 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContext
 
-object WwwSystem {
+object Main {
   val config: Config = ConfigFactory.load
   val namespace = "net.onplatforms.platform.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
   def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
-  val wwwConfig = getConfigInNamespace("system")
+  val systemConfig = getConfigInNamespace("system")
   def main(args: Array[String]): Unit = {
     val env = new {
-      val config: Config = WwwSystem.config
-      val namespace: String = WwwSystem.namespace
-      val version: String = wwwConfig.getString("version")
+      val config: Config = Main.config
+      val namespace: String = Main.namespace
+      val version: String = systemConfig.getString("version")
       implicit val system = ActorSystem("platform-system", this.config)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
@@ -46,6 +46,6 @@ object WwwSystem {
     ).foldLeft[Route](reject)(_ ~ _)
 
     val route = logRequest("access-log", InfoLevel)(mapping)
-    Http().bindAndHandle(route, wwwConfig.getString("listen-address"), wwwConfig.getInt("listen-port"))
+    Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
   }
 }
