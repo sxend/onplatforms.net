@@ -10,13 +10,8 @@ dependencies:
     - mkdir -p ~/.aws
     - envsubst < .aws/credentials.template > ~/.aws/credentials
     - envsubst < .aws/config.template > ~/.aws/config
-    - mkdir -p ~/.docker
-    - aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
-    - docker version
-    - docker info
-    - echo ${APP_VERSION}
-    - nvm install v6.9.1
-    - nvm alias default v6.9.1
+    - mkdir -p ~/.docker && aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
+    - nvm install v6.9.1 && nvm alias default v6.9.1
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
     - docker build -t docker-registry.onplatforms.net/zero/www:${APP_VERSION} --build-arg PROFILE=www --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
@@ -29,4 +24,4 @@ deployment:
       - docker push docker-registry.onplatforms.net/zero/www:${APP_VERSION}
       - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/${APP_VERSION}/static/
       - cd static && aws s3 sync ./dist/ s3://cdn.onplatforms.net/zero/latest/static/
-      - ./eb/create-eb-version.sh ${APP_VERSION}
+      - ./eb/create-eb-version.sh www ${APP_VERSION}
