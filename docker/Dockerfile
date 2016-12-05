@@ -4,7 +4,11 @@ MAINTAINER sxend
 
 ARG APP_VERSION=latest
 
+ENV APP_VERSION $APP_VERSION
+
 ARG APP_PROFILE
+
+ENV APP_PROFILE $APP_PROFILE
 
 ADD ./target/scala-2.11/zero.jar /opt/zero.jar
 
