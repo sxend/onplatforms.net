@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext
 
 object Main {
   val config: Config = ConfigFactory.load
-  val namespace = "net.onplatforms.platform.www"
+  val namespace = "net.onplatforms.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
   def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
   val systemConfig = getConfigInNamespace("system")

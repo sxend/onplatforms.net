@@ -22,5 +22,5 @@ sudo docker build --build-arg APP_VERSION=b15-ac95f2e05e109eb41ae0afa556c183ee8a
 ```
 run
 ```
-sudo docker run -d -e MAIN_CLASS=net.onplatforms.platform.www.WwwSystem <image-id>
+sudo docker run -d -e MAIN_CLASS=net.onplatforms.www.WwwSystem <image-id>
 ```
