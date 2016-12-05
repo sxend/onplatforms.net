@@ -1,4 +1,4 @@
-package net.onplatforms.platform.lib.directive
+package net.onplatforms.lib.directive
 
 trait Directives extends AnyRef
     with TemplateDirective

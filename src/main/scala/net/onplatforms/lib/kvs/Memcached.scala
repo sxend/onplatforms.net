@@ -1,4 +1,4 @@
-package net.onplatforms.platform.lib.kvs
+package net.onplatforms.lib.kvs
 
 import com.typesafe.config.Config
 import shade.memcached.{Configuration, Memcached => Shade}

@@ -1,11 +1,11 @@
-package net.onplatforms.platform.www.router
+package net.onplatforms.www.router
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import net.onplatforms.platform.lib.directive.Directives._
-import net.onplatforms.platform.lib.directive.TemplateDirective
-import net.onplatforms.platform.lib.directive.TemplateDirective.Implicits
+import net.onplatforms.lib.directive.Directives._
+import net.onplatforms.lib.directive.TemplateDirective
+import net.onplatforms.lib.directive.TemplateDirective.Implicits
 
 import scala.util.Success
 

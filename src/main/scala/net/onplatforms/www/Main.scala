@@ -1,4 +1,4 @@
-package net.onplatforms.platform.www
+package net.onplatforms.www
 
 import akka.actor.ActorSystem
 import akka.event.Logging._
@@ -7,9 +7,9 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import net.onplatforms.platform.lib.directive.{AuthenticationDirective, TemplateDirective}
-import net.onplatforms.platform.lib.kvs.Memcached
-import net.onplatforms.platform.www.router._
+import net.onplatforms.lib.directive.{AuthenticationDirective, TemplateDirective}
+import net.onplatforms.lib.kvs.Memcached
+import net.onplatforms.www.router._
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContext
@@ -33,16 +33,12 @@ object Main {
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
       val indexRouter = new IndexRouter(this)
-      val mypageRouter = new MypageRouter(this)
-      val signupRouter = new SignupRouter(this)
       val memcached = new Memcached(this)
     }
     import env._
 
     val mapping = Seq(
-      get(path("")(indexRouter.handle)),
-      post(path("signup")(signupRouter.handle)),
-      get(path("mypage")(mypageRouter.handle))
+      get(path("")(indexRouter.handle))
     ).foldLeft[Route](reject)(_ ~ _)
 
     val route = logRequest("access-log", InfoLevel)(mapping)

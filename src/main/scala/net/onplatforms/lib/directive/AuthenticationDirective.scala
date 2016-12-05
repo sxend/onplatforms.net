@@ -1,4 +1,4 @@
-package net.onplatforms.platform.lib.directive
+package net.onplatforms.lib.directive
 
 import java.util.UUID
 
@@ -7,8 +7,9 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import net.onplatforms.platform.lib.kvs.Memcached
+import net.onplatforms.lib.kvs.Memcached
 import com.typesafe.config.Config
+import net.onplatforms.lib.kvs.Memcached
 import org.apache.commons.lang3.SerializationUtils
 
 import scala.concurrent.duration._
