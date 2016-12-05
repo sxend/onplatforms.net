@@ -1,0 +1,21 @@
+<configuration>
+
+    <property name="LoggingDir" value="./logs/" />
+
+    <appender name="app" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+
+        <file>${LoggingDir}app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LoggingDir}/app.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{ISO8601} %p %t %c{1}.%M - %m - %mdc%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="app" />
+    </root>
+</configuration>

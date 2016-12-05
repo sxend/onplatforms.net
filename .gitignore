@@ -14,3 +14,4 @@ dist/
 .ensime
 .ensime_cache/
 npm-debug.log
+logs/

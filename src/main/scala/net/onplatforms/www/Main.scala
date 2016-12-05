@@ -2,7 +2,7 @@ package net.onplatforms.www
 
 import akka.actor.ActorSystem
 import akka.event.Logging._
-import akka.event.LoggingAdapter
+import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
@@ -25,15 +25,14 @@ object Main {
       val config: Config = Main.config
       val namespace: String = Main.namespace
       val version: String = systemConfig.getString("version")
-      implicit val system = ActorSystem("platform-system", this.config)
+      implicit val system = ActorSystem("www-system", this.config)
+      val log = Logging(system.eventStream, getClass)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
       val logger: LoggingAdapter = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
-      val authenticationDirectiveImplicits = AuthenticationDirective.Implicits(this)
       val indexRouter = new IndexRouter(this)
-      val memcached = new Memcached(this)
     }
     import env._
 
