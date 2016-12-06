@@ -19,7 +19,7 @@ object Main {
   val namespace = "net.onplatforms.www"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
   def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
-  val systemConfig = getConfigInNamespace("system")
+  val systemConfig: Config = getConfigInNamespace("system")
   def main(args: Array[String]): Unit = {
     val env = new {
       val config: Config = Main.config
