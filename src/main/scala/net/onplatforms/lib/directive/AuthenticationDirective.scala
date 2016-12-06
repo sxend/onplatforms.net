@@ -17,7 +17,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 trait AuthenticationDirective {
+
   import AuthenticationDirective._
+
   def authenticated(route: (String, String) => Route)(implicit implicits: AuthenticationDirective.Implicits): Route = {
     import implicits._
     requireValidSession { session =>
@@ -31,6 +33,7 @@ trait AuthenticationDirective {
       }
     }
   }
+
   def requireValidSession(f: => Session => Route)(implicit implicits: Implicits): Route =
     optionalCookie(implicits.cookieKey) {
       case Some(pair) =>
@@ -41,6 +44,7 @@ trait AuthenticationDirective {
         }
       case _ => reject
     }
+
   def getOrNewSession(f: => Session => Route)(implicit implicits: Implicits): Route = {
     optionalCookie(implicits.cookieKey) {
       case Some(pair) =>
@@ -51,6 +55,7 @@ trait AuthenticationDirective {
       case _ => newSession(f)
     }
   }
+
   def newSession(f: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits): Route = {
     import implicits._
     val newSessionId = UUID.randomUUID().toString
@@ -84,6 +89,7 @@ trait AuthenticationDirective {
 
   private def setToMemcache(id: String, bytes: Array[Byte])(implicit implicits: Implicits) =
     implicits.env.memcached.client.set[Array[Byte]](id, bytes, Int.MaxValue.seconds)
+
   private def getFromMemcache(id: String)(implicit implicits: Implicits) =
     implicits.env.memcached.client.get[Array[Byte]](id)
 
@@ -92,15 +98,19 @@ trait AuthenticationDirective {
       case Success(bytes) => route(bytes)
       case Failure(t)     => onFail(t)
     }
+
   private def onDeserialize(bytes: Array[Byte])(route: Session => Route, onFail: => OnFail = failWith)(implicit implicits: Implicits) =
     onComplete(deserialize(bytes)) {
       case Success(session) => route(session)
       case Failure(t)       => onFail(t)
     }
+
   private def serialize(session: Session)(implicit implicits: Implicits): Future[Array[Byte]] =
     Future(SerializationUtils.serialize(session.asInstanceOf[Serializable]))(implicits.env.blockingContext)
+
   private def deserialize(bytes: Array[Byte])(implicit implicits: Implicits): Future[Session] =
     Future(SerializationUtils.deserialize[Session](bytes))(implicits.env.blockingContext)
+
   private def gotoTop = redirect("/", StatusCodes.Found)
 }
 
