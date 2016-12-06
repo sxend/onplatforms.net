@@ -33,6 +33,7 @@ libraryDependencies ++= {
     "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.7",
     "org.apache.logging.log4j" % "log4j-core" % "2.7",
     "org.apache.logging.log4j" % "log4j-api" % "2.7",
+    "com.lmax" % "disruptor" % "3.3.6",
     "com.chuusai" %% "shapeless" % shapelessVersion,
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "org.specs2" %% "specs2-html" % spec2Version % "test",

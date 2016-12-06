@@ -30,7 +30,9 @@ object TemplateDirective extends TemplateDirective with Lib {
                          val config: Config
                          val blockingContext: ExecutionContext
                        }) {
+
     private[lib] val templateConfig = getConfigInNamespace("directives.template")(env)
+
     private[lib] val engine = new PebbleEngine.Builder()
       .cacheActive(templateConfig.getBoolean("enabled-cache"))
       .build()

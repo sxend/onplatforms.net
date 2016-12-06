@@ -112,9 +112,11 @@ trait AuthenticationDirective {
     Future(SerializationUtils.deserialize[Session](bytes))(implicits.env.blockingContext)
 
   private def gotoTop = redirect("/", StatusCodes.Found)
+
 }
 
 object AuthenticationDirective extends AuthenticationDirective {
+
   import net.ceedubs.ficus.Ficus._
   type Session = Map[String, Any]
   type OnFail = Throwable => Route
@@ -126,11 +128,12 @@ object AuthenticationDirective extends AuthenticationDirective {
                          val config: Config
                          val namespace: String
                        }) {
+
     private val config = env.config.getConfig(s"${env.namespace}.directives.authentication")
     private val sessionConfig = config.getConfig("session")
-    val cookieKey = sessionConfig.getString("cookie.key")
-    val maxAge = sessionConfig.as[FiniteDuration]("cookie.max-age").toSeconds
-    val path = sessionConfig.getString("cookie.path")
-    val domain = sessionConfig.getString("cookie.domain")
+    val cookieKey: String = sessionConfig.getString("cookie.key")
+    val maxAge: Long = sessionConfig.as[FiniteDuration]("cookie.max-age").toSeconds
+    val path: String = sessionConfig.getString("cookie.path")
+    val domain: String = sessionConfig.getString("cookie.domain")
   }
 }
