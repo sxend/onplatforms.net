@@ -9,6 +9,12 @@
       "ContainerPort": "9090"
     }
   ],
+  "Volumes": [
+    {
+      "HostDirectory": "/var/log/eb-docker/containers/eb-current-app/logs",
+      "ContainerDirectory": "/logs"
+    }
+  ]
   "Authentication": {
     "Bucket": "internal-storage.onplatforms.net",
     "Key": "docker/config.json"
