@@ -46,11 +46,3 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     );
   }
 }
-
-class MenuItems extends React.Component<{}, {}> {
-  render() {
-    return (
-      <span>item</span>
-    )
-  }
-}
