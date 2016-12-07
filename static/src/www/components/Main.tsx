@@ -4,7 +4,7 @@ import {Menu} from "./Menu";
 export class Main extends React.Component<{}, {}> {
     render() {
         return (
-          <div className="container">
+          <div>
               <Menu/>
           </div>
         );
