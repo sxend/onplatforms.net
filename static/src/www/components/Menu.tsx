@@ -23,12 +23,13 @@ export class Menu extends React.Component<MenuProps, MenuState> {
           <header className="nav">
             <div className="container">
               <div className="nav-left">
-                <p className="nav-item title menu--logo">ON</p>
+                <span></span>
+                <p className="nav-item title">ON</p>
               </div>
-              <span className={this.state.isMenuToggleOn ? "nav-toggle is-active" : "nav-toggle"} onClick={this.onMenuClick}>
+              <span className={"nav-toggle" + (this.state.isMenuToggleOn ? " is-active" : "")} onClick={this.onMenuClick}>
               <span></span><span></span><span></span>
               </span>
-              <div className={this.state.isMenuToggleOn ? "nav-right nav-menu is-active" : "nav-right nav-menu"}>
+              <div className={"nav-right nav-menu" + (this.state.isMenuToggleOn ? " is-active" : "")}>
                 <a className="nav-item is-active">
                   <span>Home</span>
                 </a>
