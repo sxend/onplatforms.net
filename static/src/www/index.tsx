@@ -1,5 +1,5 @@
 import "./styles/index.scss";
-import "../../node_modules/purecss/build/pure-min.css";
+import "../../node_modules/bulma/css/bulma.css";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";

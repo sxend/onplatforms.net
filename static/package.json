@@ -11,7 +11,7 @@
   "dependencies": {
     "@types/react": "^0.14.52",
     "@types/react-dom": "^0.14.19",
-    "purecss": "^0.6.0",
+    "bulma": "^0.2.3",
     "react": "^15.4.1",
     "react-dom": "^15.4.1"
   },
