@@ -26,7 +26,8 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                 <span></span>
                 <p className="nav-item title">ON</p>
               </div>
-              <span className={"nav-toggle" + (this.state.isMenuToggleOn ? " is-active" : "")} onClick={this.onMenuClick}>
+              <span className={"nav-toggle" + (this.state.isMenuToggleOn ? " is-active" : "")}
+                    onClick={this.onMenuClick}>
               <span></span><span></span><span></span>
               </span>
               <div className={"nav-right nav-menu" + (this.state.isMenuToggleOn ? " is-active" : "")}>
