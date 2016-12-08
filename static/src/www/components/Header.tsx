@@ -5,7 +5,7 @@ interface MenuState {
 }
 interface MenuProps {
 }
-export class Menu extends React.Component<MenuProps, MenuState> {
+export class Header extends React.Component<MenuProps, MenuState> {
   constructor(props: MenuProps) {
     super(props);
     this.state = {isMenuToggleOn: false};
@@ -33,13 +33,13 @@ export class Menu extends React.Component<MenuProps, MenuState> {
               <div className={"nav-right nav-menu" + (this.state.isMenuToggleOn ? " is-active" : "")}>
                 <span className="nav-item">
                   <a className={"is-inverted is-active" + (
-                    this.state.isMenuToggleOn ? " on-menu--item__large" : " on-menu--item"
+                    this.state.isMenuToggleOn ? " on-header--item__large" : " on-header--item"
                     )}>Home</a>
                 </span>
                 <span className="nav-item">
                   <a className="button is-dark is-inverted">
                     <del className={ (
-                    this.state.isMenuToggleOn ? " on-menu--item__large" : "on-menu--item"
+                    this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
                     )}>
                       Signin
                     </del>
