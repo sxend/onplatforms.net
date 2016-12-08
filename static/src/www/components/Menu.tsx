@@ -32,10 +32,18 @@ export class Menu extends React.Component<MenuProps, MenuState> {
               </span>
               <div className={"nav-right nav-menu" + (this.state.isMenuToggleOn ? " is-active" : "")}>
                 <span className="nav-item">
-                  <a className="is-inverted is-active">Home</a>
+                  <a className={"is-inverted is-active" + (
+                    this.state.isMenuToggleOn ? " on-menu--item__large" : " on-menu--item"
+                    )}>Home</a>
                 </span>
                 <span className="nav-item">
-                  <a className="button is-dark is-inverted"><del>Signin</del></a>
+                  <a className="button is-dark is-inverted">
+                    <del className={ (
+                    this.state.isMenuToggleOn ? " on-menu--item__large" : "on-menu--item"
+                    )}>
+                      Signin
+                    </del>
+                  </a>
                 </span>
                 <span></span>
               </div>
