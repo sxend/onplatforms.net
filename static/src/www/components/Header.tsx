@@ -1,12 +1,12 @@
 import * as React from "react";
 
-interface MenuState {
+export interface HeaderState {
   isMenuToggleOn: boolean;
 }
-interface MenuProps {
+export interface HeaderProps {
 }
-export class Header extends React.Component<MenuProps, MenuState> {
-  constructor(props: MenuProps) {
+export class Header extends React.Component<HeaderProps, HeaderState> {
+  constructor(props: HeaderProps) {
     super(props);
     this.state = {isMenuToggleOn: false};
     this.onMenuClick = this.onMenuClick.bind(this);
@@ -18,7 +18,7 @@ export class Header extends React.Component<MenuProps, MenuState> {
   }
   render() {
     return (
-      <section className="hero is-dark is-medium">
+      <section className="on-header hero is-dark is-medium">
         <div className="hero-head">
           <header className="nav">
             <div className="container">
