@@ -24,4 +24,4 @@ deployment:
       - docker push docker-registry.onplatforms.net/zero/www:${APP_VERSION}
       - cd static && aws s3 sync ./dist/www/ s3://cdn.onplatforms.net/www/${APP_VERSION}/static/
       - cd static && aws s3 sync ./dist/www/ s3://cdn.onplatforms.net/www/latest/static/
-      - ./eb/create-eb-version.sh www ${APP_VERSION}
+#      - ./eb/create-eb-version.sh www ${APP_VERSION}
