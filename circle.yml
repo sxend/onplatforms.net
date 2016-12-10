@@ -15,7 +15,6 @@ dependencies:
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
     - docker build -t docker-registry.onplatforms.net/zero/www:${APP_VERSION} --build-arg APP_PROFILE=www --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
-    - docker save -o /tmp/zero.www.tar docker-registry.onplatforms.net/zero/www:${APP_VERSION} && gzip /tmp/zero.www.tar
     - cd static && npm install && npm run build
 deployment:
   publish:
@@ -23,7 +22,6 @@ deployment:
     commands:
       - aws s3 cp ./target/scala-2.11/zero.jar s3://internal-storage.onplatforms.net/zero/${APP_VERSION}/jars/
       - docker push docker-registry.onplatforms.net/zero/www:${APP_VERSION}
-      - aws s3 cp /tmp/zero.www.tar.gz s3://internal-storage.onplatforms.net/zero/${APP_VERSION}/containers/
       - cd static && aws s3 sync ./dist/www/ s3://cdn.onplatforms.net/www/${APP_VERSION}/static/
       - cd static && aws s3 sync ./dist/www/ s3://cdn.onplatforms.net/www/latest/static/
       - ./eb/create-eb-version.sh www ${APP_VERSION}
