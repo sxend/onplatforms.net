@@ -24,5 +24,5 @@ deployment:
       - APP_PROFILE=www && docker push docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}
       - APP_PROFILE=www && cd static && aws s3 sync ./dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/${APP_VERSION}/static/
       - APP_PROFILE=www && cd static && aws s3 sync ./dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/latest/static/
-      - aws s3 cp ./scripts/deploy.sh s3://public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh
       - APP_PROFILE=www && sed -e "s/<APP_PROFILE>/${APP_PROFILE}/" -e "s/<APP_VERSION>/${APP_VERSION}/"  README.md
+      - aws s3 cp ./scripts/deploy.sh s3://public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh
