@@ -2,13 +2,12 @@ package net.onplatforms.www
 
 import akka.actor.ActorSystem
 import akka.event.Logging._
-import akka.event.{Logging, LoggingAdapter}
+import akka.event.Logging
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import net.onplatforms.lib.directive.{AuthenticationDirective, TemplateDirective}
-import net.onplatforms.lib.kvs.Memcached
+import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.www.router._
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -26,11 +25,10 @@ object Main {
       val namespace: String = Main.namespace
       val version: String = systemConfig.getString("version")
       implicit val system = ActorSystem("www-system", this.config)
-      val log = Logging(system.eventStream, getClass)
+      val logger = Logging(system.eventStream, getClass)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
-      val logger: LoggingAdapter = system.log
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val indexRouter = new IndexRouter(this)
     }
@@ -40,7 +38,7 @@ object Main {
       get(path("")(indexRouter.handle))
     ).foldLeft[Route](reject)(_ ~ _)
 
-    val route = logRequest("access-log", InfoLevel)(mapping)
+    val route = logRequest("access", InfoLevel)(mapping)
     Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
   }
 }
