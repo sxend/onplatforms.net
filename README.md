@@ -24,3 +24,8 @@ run
 ```
 sudo docker run -d -p 9090:9090 -e APP_PROFILE=www -e APP_VERSION=<APP_VERSION> <image-id>
 ```
+
+#### use deploy script
+```
+curl -s https://s3-ap-northeast-1.amazonaws.com/public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh | sh -s -- <APP_PROFILE> <APP_VERSION>
+```
