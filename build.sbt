@@ -16,14 +16,13 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   val akkaHttpVersion = "10.0.0"
-  val shapelessVersion = "2.3.1"
   val spec2Version = "3.8.4"
-  val scalaTestVersion = "2.2.6"
   Seq(
+    "com.typesafe.slick" %% "slick" % "3.1.1",
+    "org.slf4j" % "slf4j-nop" % "1.6.4",
     "org.apache.commons" % "commons-lang3" % "3.5",
     "commons-codec" % "commons-codec" % "1.10",
     "com.bionicspirit" %% "shade" % "1.7.4",
-    "org.twitter4j" % "twitter4j-async" % "4.0.5",
     "com.mitchellbosecke" % "pebble" % "2.2.3",
     "com.iheart" %% "ficus" % "1.3.2",
     "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
@@ -35,8 +34,6 @@ libraryDependencies ++= {
     "org.apache.logging.log4j" % "log4j-core" % "2.7",
     "org.apache.logging.log4j" % "log4j-api" % "2.7",
     "com.lmax" % "disruptor" % "3.3.6",
-    "com.chuusai" %% "shapeless" % shapelessVersion,
-    "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "org.specs2" %% "specs2-html" % spec2Version % "test",
     "org.specs2" %% "specs2-junit" % spec2Version % "test",
     "org.specs2" %% "specs2-core" % spec2Version % "test",
