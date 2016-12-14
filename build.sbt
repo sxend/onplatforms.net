@@ -19,6 +19,7 @@ libraryDependencies ++= {
   val spec2Version = "3.8.4"
   Seq(
     "com.typesafe.slick" %% "slick" % "3.1.1",
+    "org.slf4j" % "slf4j-nop" % "1.6.4",
     "org.apache.commons" % "commons-lang3" % "3.5",
     "commons-codec" % "commons-codec" % "1.10",
     "com.bionicspirit" %% "shade" % "1.7.4",
@@ -60,6 +61,9 @@ scalacOptions ++= Seq(
 
 assemblyMergeStrategy in assembly := {
   case PathList(ps @ _*) if ps.last endsWith "bnd.bnd" => MergeStrategy.first
+  case PathList(ps @ _*) if List(
+    "StaticLoggerBinder.class", "StaticMDCBinder.class", "StaticMarkerBinder.class").exists(ps.last.endsWith) =>
+    MergeStrategy.last
   case x => (assemblyMergeStrategy in assembly).value(x)
 }
 
