@@ -19,7 +19,6 @@ libraryDependencies ++= {
   val spec2Version = "3.8.4"
   Seq(
     "com.typesafe.slick" %% "slick" % "3.1.1",
-    "org.slf4j" % "slf4j-nop" % "1.6.4",
     "org.apache.commons" % "commons-lang3" % "3.5",
     "commons-codec" % "commons-codec" % "1.10",
     "com.bionicspirit" %% "shade" % "1.7.4",
