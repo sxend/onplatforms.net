@@ -21,6 +21,7 @@ libraryDependencies ++= {
   val scalaTestVersion = "2.2.6"
   Seq(
     "org.apache.commons" % "commons-lang3" % "3.5",
+    "commons-codec" % "commons-codec" % "1.10",
     "com.bionicspirit" %% "shade" % "1.7.4",
     "org.twitter4j" % "twitter4j-async" % "4.0.5",
     "com.mitchellbosecke" % "pebble" % "2.2.3",
