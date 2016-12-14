@@ -14,15 +14,12 @@ dependencies:
     - nvm install v6.9.1 && nvm alias default v6.9.1
   override:
     - sbt "set version := \"${APP_VERSION}\"" assembly
-    - APP_PROFILE=www && docker build -t docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION} --build-arg APP_PROFILE=${APP_PROFILE} --build-arg APP_VERSION=${APP_VERSION} -f docker/Dockerfile .
+    - ./scripts/build-profile.sh www ${APP_VERSION}
     - cd static && npm install && npm run build
 deployment:
   publish:
     branch: master
     commands:
       - aws s3 cp ./target/scala-2.11/zero.jar s3://internal-storage.onplatforms.net/zero/${APP_VERSION}/jars/
-      - APP_PROFILE=www && docker push docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}
-      - APP_PROFILE=www && cd static && aws s3 sync ./dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/${APP_VERSION}/static/
-      - APP_PROFILE=www && cd static && aws s3 sync ./dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/latest/static/
-      - APP_PROFILE=www && sed -e "s/<APP_PROFILE>/${APP_PROFILE}/" -e "s/<APP_VERSION>/${APP_VERSION}/"  README.md
+      - ./scripts/release-profile.sh www ${APP_VERSION}
       - aws s3 cp ./scripts/deploy.sh s3://public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh
