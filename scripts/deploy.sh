@@ -1,8 +1,8 @@
 #!/bin/bash
 
 APP_PROFILE=$1
-
-APP_VERSION=$2
+LISTEN_PORT=$2
+APP_VERSION=$3
 
 sudo docker pull docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}
 
@@ -14,5 +14,5 @@ if [ "$(sudo docker ps -a -q --filter "NAME=${APP_PROFILE}.onplatforms.net" | wc
   sudo docker rm ${APP_PROFILE}.onplatforms.net
 fi
 
-sudo docker run --name=${APP_PROFILE}.onplatforms.net -d -it -p 9090:9090 \
+sudo docker run --name=${APP_PROFILE}.onplatforms.net -d -it -p ${LISTEN_PORT}:${LISTEN_PORT} \
   docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}

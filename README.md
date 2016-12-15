@@ -27,5 +27,5 @@ sudo docker run -d -p 9090:9090 -e APP_PROFILE=www -e APP_VERSION=<APP_VERSION> 
 
 #### use deploy script
 ```
-curl -s https://s3-ap-northeast-1.amazonaws.com/public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh | sh -s -- <APP_PROFILE> <APP_VERSION>
+curl -s https://s3-ap-northeast-1.amazonaws.com/public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh | sh -s -- <APP_PROFILE> <LISTEN_PORT> <APP_VERSION>
 ```
