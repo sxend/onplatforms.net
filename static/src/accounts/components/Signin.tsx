@@ -1,16 +1,16 @@
 import * as React from "react";
 
-interface ContentsProps {
+interface SigninProps {
 }
-interface ContentsState {
-  isValidEmail: boolean
+interface SigninState {
   email: string
   password: string
+  isValidEmail: boolean
 }
-export class Contents extends React.Component<ContentsProps, ContentsState> {
-  constructor(props: ContentsProps) {
+export class Signin extends React.Component<SigninProps, SigninState> {
+  constructor(props: SigninProps) {
     super(props);
-    this.state = {} as ContentsState;
+    this.state = {} as SigninState;
   }
   render() {
     return (
@@ -19,7 +19,7 @@ export class Contents extends React.Component<ContentsProps, ContentsState> {
         <p className="control has-icon has-icon-right">
           <input className="input" type="text" placeholder="Email input" value={this.state.email} onChange={e => this.changeEmail(e)} />
             <i className="fa fa-warning"></i>
-          {this.state.isValidEmail ? <span className="help is-success">This email is valid</span>: ""}
+          {this.state.isValidEmail ? <span className="help is-success">This Email is valid</span>: ""}
         </p>
         <label className="label">Password</label>
         <p className="control has-icon">
@@ -27,7 +27,7 @@ export class Contents extends React.Component<ContentsProps, ContentsState> {
             <i className="fa fa-lock"></i>
         </p>
         <p className="control">
-          <button className="button is-primary" onClick={e => this.login(e)}>Login</button>
+          <button className="button is-primary" onClick={e => this.signin(e)}>Signin</button>
         </p>
       </div>
     );
@@ -37,9 +37,9 @@ export class Contents extends React.Component<ContentsProps, ContentsState> {
     this.setState({
       email: e.target.value,
       isValidEmail: this.mailRegexp.test(e.target.value)
-    } as ContentsState);
+    } as SigninState);
   }
-  login(e: any) {
+  signin(e: any) {
   }
   componentDidMount() {
     document.title = "www.onplatforms.net";
