@@ -9,6 +9,7 @@ interface SignupState {
   password: string
   isValidUserName: boolean
   isValidEmail: boolean
+  isValidPassword: boolean
 }
 export class Signup extends React.Component<SignupProps, SignupState> {
   constructor(props: SignupProps) {
@@ -20,26 +21,30 @@ export class Signup extends React.Component<SignupProps, SignupState> {
       <div>
         <Header/>
         <div className="container on-contents">
-          <label className="label">UserName</label>
-          <p className="control has-icon has-icon-right">
-            <input className="input" type="text" placeholder="UserName input" value={this.state.userName} onChange={e => this.changeUserName(e)} />
-            <i className="fa fa-warning"></i>
-            {this.state.isValidEmail ? <span className="help is-success">This UserName is valid</span>: ""}
-          </p>
-          <label className="label">Email</label>
-          <p className="control has-icon has-icon-right">
-            <input className="input" type="text" placeholder="Email input" value={this.state.email} onChange={e => this.changeEmail(e)} />
-            <i className="fa fa-warning"></i>
-            {this.state.isValidEmail ? <span className="help is-success">This Email is valid</span>: ""}
-          </p>
-          <label className="label">Password</label>
-          <p className="control has-icon">
-            <input className="input" type="password" placeholder="Password" value={this.state.password} />
-            <i className="fa fa-lock"></i>
-          </p>
-          <p className="control">
-            <button className="button is-primary" onClick={e => this.signup(e)}>Signup</button>
-          </p>
+          <div className="column is-half is-offset-one-quarter">
+            <label className="label">UserName</label>
+            <p className="control has-icon has-icon-right">
+              <input className="input" type="text" placeholder="UserName input" value={this.state.userName} onChange={e => this.changeUserName(e)} />
+              <i className="fa fa-warning"></i>
+              {this.state.isValidUserName ? <span className="help is-success">This UserName is valid</span>: ""}
+            </p>
+            <label className="label">Email</label>
+            <p className="control has-icon has-icon-right">
+              <input className="input" type="text" placeholder="Email input" value={this.state.email} onChange={e => this.changeEmail(e)} />
+              <i className="fa fa-warning"></i>
+              {this.state.isValidEmail ? <span className="help is-success">This Email is valid</span>: ""}
+            </p>
+            <label className="label">Password</label>
+            <p className="control has-icon">
+              <input className="input" type="password" placeholder="Password" value={this.state.password} onChange={e => this.changePassword(e)} />
+              <i className="fa fa-lock"></i>
+            </p>
+            <p className="control">
+              <button className={
+                "button is-primary " + (this.state.isValidUserName && this.state.isValidEmail && this.state.isValidPassword ? "" : "is-disabled")
+              } onClick={e => this.signup(e)}>Signup</button>
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -58,7 +63,15 @@ export class Signup extends React.Component<SignupProps, SignupState> {
       isValidEmail: this.mailRegexp.test(e.target.value)
     } as SignupState);
   }
+  private passwordRegexp = /^[\S]{8,128}$/i;
+  changePassword(e: any) {
+    this.setState({
+      password: e.target.value,
+      isValidPassword: this.passwordRegexp.test(e.target.value)
+    } as SignupState);
+  }
   signup(e: any) {
+    console.log("signup");
   }
   componentDidMount() {
     document.title = "www.onplatforms.net";

@@ -1,6 +1,7 @@
 import * as React from "react";
 import {Header} from "./Header";
 import {Signin} from "./Signin";
+import {Signup} from "./Signup";
 
 interface MainProps {
 }
@@ -16,7 +17,7 @@ export class Main extends React.Component<MainProps, MainState> {
     return (
       <div>
         <Header/>
-        <Signin />
+        <Signup />
       </div>
     );
   }
