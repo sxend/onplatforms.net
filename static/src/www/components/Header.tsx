@@ -37,12 +37,10 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
                     )}>Home</a>
                 </span>
                 <span className="nav-item">
-                  <a href="https://accounts.onplatforms.net/" className="button is-dark is-inverted">
-                    <del className={ (
-                    this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
+                  <a href="https://accounts.onplatforms.net/" className={ (
+                    "button is-dark is-inverted" + this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
                     )}>
-                      Signin
-                    </del>
+                    Signin
                   </a>
                 </span>
                 <span></span>
