@@ -9,10 +9,12 @@ import net.onplatforms.lib.directive.TemplateDirective.Implicits
 
 import scala.util.Success
 
-class IndexRouter(env: {
-                    val templateDirectiveImplicits: TemplateDirective.Implicits
-                    val version: String
-                  }) {
+class IndexRouter(
+  env: {
+    val templateDirectiveImplicits: TemplateDirective.Implicits
+    val version: String
+  }
+) {
 
   implicit val templateImplicits: Implicits = env.templateDirectiveImplicits
 

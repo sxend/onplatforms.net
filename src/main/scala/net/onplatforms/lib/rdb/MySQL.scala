@@ -6,12 +6,14 @@ import slick._
 
 import scala.concurrent.ExecutionContext
 
-class MySQL(env: {
-              val system: ActorSystem
-              val blockingContext: ExecutionContext
-              val namespace: String
-              val config: Config
-            }) {
+class MySQL(
+  env: {
+    val system: ActorSystem
+    val blockingContext: ExecutionContext
+    val namespace: String
+    val config: Config
+  }
+) {
   private val config = env.config.getConfig(s"${env.namespace}.rdb.mysql")
   private val host = config.getString("host")
   private val port = config.getInt("port")

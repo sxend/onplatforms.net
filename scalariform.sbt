@@ -3,7 +3,7 @@ import scalariform.formatter.preferences._
 
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(AlignSingleLineCaseStatements, true)
-  .setPreference(DoubleIndentClassDeclaration, true)
+  .setPreference(DoubleIndentClassDeclaration, false)
   .setPreference(DanglingCloseParenthesis, Preserve)
   .setPreference(AlignArguments, true)
   .setPreference(AlignParameters, true)

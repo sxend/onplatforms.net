@@ -16,13 +16,15 @@ import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class AuthenticationService(env: {
-                              val logger: LoggingAdapter
-                              val config: Config
-                              val namespace: String
-                              val blockingContext: ExecutionContext
-                              val mysql: MySQL
-                            }) extends Actor {
+class AuthenticationService(
+  env: {
+    val logger: LoggingAdapter
+    val config: Config
+    val namespace: String
+    val blockingContext: ExecutionContext
+    val mysql: MySQL
+  }
+) extends Actor {
   import context.dispatcher
   private val SALT: String = env.config.getString(s"${env.namespace}.authentication.owned.password-hash-salt")
   private val db = env.mysql.DB

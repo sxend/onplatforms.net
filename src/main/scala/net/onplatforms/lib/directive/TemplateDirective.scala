@@ -26,10 +26,12 @@ trait TemplateDirective {
 
 object TemplateDirective extends TemplateDirective with Lib {
 
-  case class Implicits(env: {
-                         val config: Config
-                         val blockingContext: ExecutionContext
-                       }) {
+  case class Implicits(
+    env: {
+      val config: Config
+      val blockingContext: ExecutionContext
+    }
+  ) {
 
     private[lib] val templateConfig = getConfigInNamespace("directives.template")(env)
 

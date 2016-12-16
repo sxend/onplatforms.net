@@ -121,13 +121,15 @@ object AuthenticationDirective extends AuthenticationDirective {
   type Session = Map[String, Any]
   type OnFail = Throwable => Route
 
-  case class Implicits(env: {
-                         val memcached: Memcached
-                         val logger: LoggingAdapter
-                         val blockingContext: ExecutionContext
-                         val config: Config
-                         val namespace: String
-                       }) {
+  case class Implicits(
+    env: {
+      val memcached: Memcached
+      val logger: LoggingAdapter
+      val blockingContext: ExecutionContext
+      val config: Config
+      val namespace: String
+    }
+  ) {
 
     private val config = env.config.getConfig(s"${env.namespace}.directives.authentication")
     private val sessionConfig = config.getConfig("session")

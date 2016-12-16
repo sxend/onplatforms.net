@@ -19,11 +19,13 @@ import spray.json._
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 
-class SignupRouter(env: {
-                     val system: ActorSystem
-                     val version: String
-                     val authenticationService: ActorRefFactory => ActorRef
-                   }) extends JsonProtocol {
+class SignupRouter(
+  env: {
+    val system: ActorSystem
+    val version: String
+    val authenticationService: ActorRefFactory => ActorRef
+  }
+) extends JsonProtocol {
   implicit private val timeout = Timeout(2.seconds)
   private val authenticationService = env.authenticationService(env.system)
 
