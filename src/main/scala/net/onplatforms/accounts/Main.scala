@@ -1,5 +1,7 @@
 package net.onplatforms.accounts
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import akka.actor.{ActorRefFactory, ActorSystem, Props}
 import akka.event.Logging
 import akka.event.Logging._
@@ -32,7 +34,7 @@ object Main {
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
       val mysql: MySQL = new MySQL(this)
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
-      val authenticationService = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this))
+      val authenticationService = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
       val indexRouter = new router.IndexRouter(this)
       val signupRouter = new router.SignupRouter(this)
     }
@@ -46,5 +48,12 @@ object Main {
 
     val route = logRequest("access", InfoLevel)(mapping)
     Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
+  }
+  object ActorNames {
+    case class Generator(basename: String) {
+      private val seqNr = new AtomicInteger(0)
+      def name: String = s"${basename}_${seqNr.incrementAndGet()}"
+    }
+    val AuthenticationService = Generator("authentication_service")
   }
 }
