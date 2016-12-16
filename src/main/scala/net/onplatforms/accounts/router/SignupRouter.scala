@@ -30,7 +30,7 @@ class SignupRouter(env: {
   def handle: Route = entity(as[Signup]) { signup =>
     if (signup.ownedSignupOpt.nonEmpty) {
       val owned = signup.ownedSignupOpt.get
-      val protocol = AuthenticationService.Protocol.Owned(owned.email, owned.password)
+      val protocol = AuthenticationService.Protocol.Owned(owned.userName, owned.email, owned.password)
       onComplete(askOwned(protocol)) {
         case Success(user) =>
           val result = SignupResult(user.id)

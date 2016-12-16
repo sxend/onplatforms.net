@@ -1,6 +1,8 @@
 import * as React from "react";
 import {Header} from "./Header";
 
+declare const fetch: Function;
+
 interface SignupProps {
 }
 interface SignupState {
@@ -71,7 +73,20 @@ export class Signup extends React.Component<SignupProps, SignupState> {
     } as SignupState);
   }
   signup(e: any) {
-    console.log("signup");
+    fetch('http://localhost:9091/signup', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ownedSignupOpt: {
+          userName: this.state.userName,
+          email: this.state.email,
+          password: this.state.password,
+        }
+      })
+    })
   }
   componentDidMount() {
     document.title = "www.onplatforms.net";

@@ -19,6 +19,7 @@ libraryDependencies ++= {
   val spec2Version = "3.8.4"
   Seq(
     "com.typesafe.slick" %% "slick" % "3.1.1",
+    "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1",
     "mysql" % "mysql-connector-java" % "6.0.5",
     "com.zaxxer" % "HikariCP" % "2.5.1",
     "org.apache.commons" % "commons-lang3" % "3.5",

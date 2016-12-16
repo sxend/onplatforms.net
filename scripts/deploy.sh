@@ -18,4 +18,5 @@ sudo docker run --name=${APP_PROFILE}.onplatforms.net -d -it -p ${LISTEN_PORT}:$
     -e RDB_HOST=$(ip route get 8.8.8.8 | awk '{ print $NF; exit }') \
     -e RDB_USER=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.name - ) \
     -e RDB_PASS=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.pass - ) \
+    -e PASSWORD_HASH_SALT=$(aws s3 cp s3://internal-storage.onplatforms.net/accounts/authentication/owned/password-hash-salt - ) \
     docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}

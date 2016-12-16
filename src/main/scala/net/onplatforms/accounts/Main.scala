@@ -10,6 +10,7 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 import net.onplatforms.accounts.service.AuthenticationService
 import net.onplatforms.lib.directive.TemplateDirective
+import net.onplatforms.lib.rdb.MySQL
 
 import scala.concurrent.ExecutionContext
 
@@ -29,6 +30,7 @@ object Main {
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
+      val mysql: MySQL = new MySQL(this)
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationService = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this))
       val indexRouter = new router.IndexRouter(this)

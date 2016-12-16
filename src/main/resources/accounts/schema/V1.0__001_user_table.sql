@@ -11,6 +11,7 @@ CREATE TABLE authentication_provider(
 CREATE TABLE owned_users(
   email VARCHAR (64),
   password_hash VARCHAR(128) NOT NULL,
+  user_name VARCHAR (32) NOT NULL,
   user_id VARCHAR (64) NOT NULL UNIQUE,
   PRIMARY KEY (email)
 );
