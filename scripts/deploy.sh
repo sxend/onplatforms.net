@@ -15,4 +15,7 @@ if [ "$(sudo docker ps -a -q --filter "NAME=${APP_PROFILE}.onplatforms.net" | wc
 fi
 
 sudo docker run --name=${APP_PROFILE}.onplatforms.net -d -it -p ${LISTEN_PORT}:${LISTEN_PORT} \
-  docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}
+    -e RDB_HOST=$(ip route get 8.8.8.8 | awk '{ print $NF; exit }') \
+    -e RDB_USER=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.name - ) \
+    -e RDB_PASS=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.pass - ) \
+    docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}
