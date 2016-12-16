@@ -1,6 +1,6 @@
 package net.onplatforms.accounts
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRefFactory, ActorSystem, Props}
 import akka.event.Logging
 import akka.event.Logging._
 import akka.http.scaladsl._
@@ -8,6 +8,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
+import net.onplatforms.accounts.service.AuthenticationService
 import net.onplatforms.lib.directive.TemplateDirective
 
 import scala.concurrent.ExecutionContext
@@ -23,18 +24,22 @@ object Main {
       val config: Config = Main.config
       val namespace: String = Main.namespace
       val version: String = systemConfig.getString("version")
-      implicit val system = ActorSystem("accounts-system", this.config)
+      implicit val system: ActorSystem = ActorSystem("accounts-system", this.config)
       val logger = Logging(system.eventStream, getClass)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
+      val authenticationService = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this))
       val indexRouter = new router.IndexRouter(this)
+      val signupRouter = new router.SignupRouter(this)
     }
     import env._
 
     val mapping = Seq(
-      get(path("")(indexRouter.handle))
+      get(path("")(indexRouter.handle)),
+      post(path("signup")(signupRouter.handle))
+
     ).foldLeft[Route](reject)(_ ~ _)
 
     val route = logRequest("access", InfoLevel)(mapping)
