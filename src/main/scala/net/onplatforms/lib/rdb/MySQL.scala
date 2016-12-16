@@ -41,5 +41,4 @@ class MySQL(
     }
   }(env.blockingContext)
 
-  //  val DB = JdbcBackend.Database.forURL(s"jdbc:mysql://$host:$port/accounts.onplatforms.net", user, pass, props)
 }
