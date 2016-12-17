@@ -12,6 +12,8 @@ interface SignupState {
   isValidUserName: boolean
   isValidEmail: boolean
   isValidPassword: boolean
+  id: string
+  signupSucceed: boolean
 }
 export class Signup extends React.Component<SignupProps, SignupState> {
   constructor(props: SignupProps) {
@@ -46,6 +48,7 @@ export class Signup extends React.Component<SignupProps, SignupState> {
                 "button is-primary " + (this.state.isValidUserName && this.state.isValidEmail && this.state.isValidPassword ? "" : "is-disabled")
               } onClick={e => this.signup(e)}>Signup</button>
             </p>
+            <p>{this.state.signupSucceed ? <h2>Signup Succeed. Hello, {this.state.userName}. [id: {this.state.id}]</h2> : ""}</p>
           </div>
         </div>
       </div>
@@ -73,7 +76,7 @@ export class Signup extends React.Component<SignupProps, SignupState> {
     } as SignupState);
   }
   signup(e: any) {
-    fetch('http://localhost:9091/signup', {
+    fetch('https://accounts.onplatforms.net/signup', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -86,7 +89,14 @@ export class Signup extends React.Component<SignupProps, SignupState> {
           password: this.state.password,
         }
       })
-    })
+    }).then((response: any) => {
+      return response.json();
+    }).then((user: any) => {
+      if(!!user.id) {
+        this.state.signupSucceed = true;
+        this.state.id = user.id;
+      }
+    });
   }
   componentDidMount() {
     document.title = "www.onplatforms.net";
