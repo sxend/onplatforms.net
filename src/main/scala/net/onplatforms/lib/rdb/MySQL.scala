@@ -21,9 +21,8 @@ class MySQL(
   private val config = env.config.getConfig(s"${env.namespace}.rdb.mysql")
 
   val DB = Database.forConfig("net.onplatforms.accounts.rdb.mysql")
-  private val interval = 30.seconds
 
-  env.system.scheduler.schedule(interval, interval) {
+  env.system.scheduler.schedule(1.minutes, 30.minutes) {
     val session = DB.createSession()
     try {
       val rs = session.prepareStatement("select 1 as one").executeQuery()
