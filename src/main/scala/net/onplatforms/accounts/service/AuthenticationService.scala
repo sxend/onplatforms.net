@@ -33,11 +33,15 @@ class AuthenticationService(
     case Owned(userName, email, password) =>
       registerOwnedUser(userName, email, password).pipeTo(sender())
   }
+  private def checkUserExists(email: String, password: String) = {
+
+  }
   private def registerOwnedUser(userName: String, email: String, password: String): Future[User] = {
     val session = db.createSession()
     session.conn.setAutoCommit(false)
     Future {
       val user: User = {
+
         val id = UUID.randomUUID().toString
         val passwordHash = passwordHashing(email, password)
         val userStmt = session.prepareInsertStatement("insert into users(id) values (?)")
