@@ -17,11 +17,13 @@ resolvers ++= Seq(
 libraryDependencies ++= {
   val akkaHttpVersion = "10.0.0"
   val spec2Version = "3.8.4"
+  val slickVersion = "3.1.1"
+  val log4jVersion = "2.7"
   Seq(
-    "com.typesafe.slick" %% "slick" % "3.1.1",
-    "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1" excludeAll(
-      ExclusionRule(organization = "com.zaxxer", name = "HikariCP-java6")
-    ),
+    "com.typesafe.slick" %% "slick" % slickVersion,
+    "com.typesafe.slick" %% "slick-hikaricp" % slickVersion excludeAll ExclusionRule(organization = "com.zaxxer", name = "HikariCP-java6"),
+    "joda-time" % "joda-time" % "2.7",
+    "org.joda" % "joda-convert" % "1.7",
     "mysql" % "mysql-connector-java" % "6.0.5",
     "com.zaxxer" % "HikariCP" % "2.5.1",
     "org.apache.commons" % "commons-lang3" % "3.5",
@@ -34,9 +36,9 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-slf4j" % "2.4.14",
-    "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.7",
-    "org.apache.logging.log4j" % "log4j-core" % "2.7",
-    "org.apache.logging.log4j" % "log4j-api" % "2.7",
+    "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4jVersion,
+    "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
+    "org.apache.logging.log4j" % "log4j-api" % log4jVersion,
     "com.lmax" % "disruptor" % "3.3.6",
     "org.specs2" %% "specs2-html" % spec2Version % "test",
     "org.specs2" %% "specs2-junit" % spec2Version % "test",

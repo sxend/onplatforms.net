@@ -3,7 +3,23 @@ onplatforms.net
 
 ### prepare
 
-`sudo docker run -p 11211:11211 -p 11212:11211 -d memcached:alpine`
+#### migration
+
+```bash
+sbt -Dflyway.schemas=accounts.onplatforms.net \
+    -Dflyway.locations="accounts/schema" \
+    -Dflyway.user=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.name - ) \
+    -Dflyway.password=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.pass - ) flywayMigrate
+```
+
+```bash
+sbt -Dflyway.schemas=accounts.onplatforms.net \
+    -Dflyway.locations="accounts/schema" \
+    -Dflyway.user=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.name - ) \
+    -Dflyway.password=$(aws s3 cp s3://internal-storage.arimit.su/internal-rdb/user.pass - )
+    -Dsbt.RDB_HOST=xxx.xxx.xxx.xxx \
+    -Dsbt.RDB_PORT=xxxxx flywayMigrate
+```
 
 ### build
 
