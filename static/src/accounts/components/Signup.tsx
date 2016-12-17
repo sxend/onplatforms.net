@@ -1,7 +1,7 @@
 import * as React from "react";
+import 'whatwg-fetch';
+import 'promise';
 import {Header} from "./Header";
-
-declare const fetch: Function;
 
 interface SignupProps {
 }
