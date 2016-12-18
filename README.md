@@ -32,15 +32,23 @@ sbt assembly
 ```
 
 #### docker build
+
 ```
-sudo docker build -f docker/Dockerfile .
+sudo docker build \
+    --build-arg APP_VERSION=<APP_VERSION> \
+    --build-arg LISTEN_PORT=<LISTEN_PORT> \
+    --build-arg APP_PROFILE=<APP_PROFILE> -f docker/Dockerfile .
 ```
-```
-sudo docker build --build-arg APP_VERSION=<APP_VERSION> -f docker/Dockerfile .
-```
+
 run
 ```
-sudo docker run -d -p 9090:9090 -e APP_PROFILE=www -e APP_VERSION=<APP_VERSION> <image-id>
+sudo docker run --name=${APP_PROFILE}.onplatforms.net -d -it \
+    -p <LISTEN_PORT>:<LISTEN_PORT> \
+    -e RDB_HOST=<RDB_HOST> \
+    -e RDB_USER=<RDB_USER> \
+    -e RDB_PASS=<RDB_PASS> \
+    -e PASSWORD_HASH_SALT=<PASSWORD_HASH_SALT> \
+    <image-id>
 ```
 
 #### use deploy script
