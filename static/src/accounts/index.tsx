@@ -18,7 +18,6 @@ ReactDOM.render((
     <Route path={PREFIX + "/"} component={Main} />
     <Route path={PREFIX + "/signup"} component={Signup} key=""/>
     <Route path={PREFIX + "/signin"} component={Signin} />
-    {/*<Route path="*" component={Main} />*/}
   </Router>
 ), document.getElementById("main-contents"));
 
