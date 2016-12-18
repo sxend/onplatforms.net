@@ -4,7 +4,7 @@ APP_PROFILE=$1
 LISTEN_PORT=$2
 APP_VERSION=$3
 
-docker push docker-registry.onplatforms.net/onplatforms.net/zero_${APP_PROFILE}:${APP_VERSION}
+docker push docker-registry.onplatforms.net/onplatforms.net/${APP_PROFILE}:${APP_VERSION}
 aws s3 sync ./static/dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/${APP_VERSION}/static/
 aws s3 sync ./static/dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/latest/static/
 sed -e "s/<APP_PROFILE>/${APP_PROFILE}/" \
