@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Router, Route, Link, browserHistory } from 'react-router';
 
 export interface HeaderState {
   isMenuToggleOn: boolean;
@@ -32,9 +33,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
               </span>
               <div className={"nav-right nav-menu" + (this.state.isMenuToggleOn ? " is-active" : "")}>
                 <span className="nav-item">
-                  <a href="/signup" className={"button is-dark is-inverted" + (
+                  <Link to="/test/accounts/signup" className={"button is-dark is-inverted" + (
                     this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
-                  )}>Signup</a>
+                  )}>Signup</Link>
                 </span>
                 <span></span>
               </div>
@@ -43,5 +44,8 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         </div>
       </section>
     );
+  }
+  componentDidMount() {
+    console.log("mount header");
   }
 }

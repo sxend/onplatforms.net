@@ -2,18 +2,18 @@ import * as React from "react";
 import 'whatwg-fetch';
 import 'promise';
 import {Header} from "./Header";
+import {UserName} from "./UserName";
+import {Email} from "./Email";
+import {Password} from "./Password";
+import ReactInstance = React.ReactInstance;
 
 interface SignupProps {
+  signupMode: boolean
 }
 interface SignupState {
-  userName: string
-  email: string
-  password: string
-  isValidUserName: boolean
-  isValidEmail: boolean
-  isValidPassword: boolean
-  id: string
-  signupSucceed: boolean
+  userNameRef: UserName
+  emailRef: Email
+  passwordRef: Password
 }
 export class Signup extends React.Component<SignupProps, SignupState> {
   constructor(props: SignupProps) {
@@ -23,80 +23,60 @@ export class Signup extends React.Component<SignupProps, SignupState> {
   render() {
     return (
       <div>
-        <Header/>
+        <Header />
         <div className="container on-contents">
           <div className="column is-half is-offset-one-quarter">
-            <label className="label">UserName</label>
-            <p className="control has-icon has-icon-right">
-              <input className="input" type="text" placeholder="UserName input" value={this.state.userName} onChange={e => this.changeUserName(e)} />
-              <i className="fa fa-warning"></i>
-              {this.state.isValidUserName ? <span className="help is-success">This UserName is valid</span>: ""}
-            </p>
-            <label className="label">Email</label>
-            <p className="control has-icon has-icon-right">
-              <input className="input" type="text" placeholder="Email input" value={this.state.email} onChange={e => this.changeEmail(e)} />
-              <i className="fa fa-warning"></i>
-              {this.state.isValidEmail ? <span className="help is-success">This Email is valid</span>: ""}
-            </p>
-            <label className="label">Password</label>
-            <p className="control has-icon">
-              <input className="input" type="password" placeholder="Password" value={this.state.password} onChange={e => this.changePassword(e)} />
-              <i className="fa fa-lock"></i>
-            </p>
+            {this.props.signupMode ? <UserName ref="userName" /> : ""}
+            <Email ref="email" />
+            <Password ref="password" />
             <p className="control">
               <button className={
-                "button is-primary " + (this.state.isValidUserName && this.state.isValidEmail && this.state.isValidPassword ? "" : "is-disabled")
+                "button is-primary"
               } onClick={e => this.signup(e)}>Signup</button>
             </p>
-            <p>{this.state.signupSucceed ? <h2>Signup Succeed. Hello, {this.state.userName}. [id: {this.state.id}]</h2> : ""}</p>
           </div>
         </div>
       </div>
     );
   }
-  private userNameRegexp = /^[\S]{0,32}$/i;
-  changeUserName(e: any) {
-    this.setState({
-      userName: e.target.value,
-      isValidUserName: this.userNameRegexp.test(e.target.value)
-    } as SignupState);
+  private isValidUserName() {
+    return this.state.userNameRef && this.state.userNameRef.state.isValidUserName;
   }
-  private mailRegexp = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-  changeEmail(e: any) {
-    this.setState({
-      email: e.target.value,
-      isValidEmail: this.mailRegexp.test(e.target.value)
-    } as SignupState);
+  private isValidEmail() {
+    return this.state.emailRef && this.state.emailRef.state.isValidEmail;
   }
-  private passwordRegexp = /^[\S]{8,128}$/i;
-  changePassword(e: any) {
-    this.setState({
-      password: e.target.value,
-      isValidPassword: this.passwordRegexp.test(e.target.value)
-    } as SignupState);
+  private isValidPassword() {
+    return this.state.passwordRef && this.state.passwordRef.state.isValidPassword;
   }
   signup(e: any) {
+    console.log(this);
+    const param = JSON.stringify({
+      userName: this.state.userNameRef.state.userName,
+      email: this.state.emailRef.state.email,
+      password: this.state.passwordRef.state.password,
+    });
+    console.log(param);
     fetch('//accounts.onplatforms.net/signup/owned', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        userName: this.state.userName,
-        email: this.state.email,
-        password: this.state.password,
-      })
+      body: param
     }).then((response: any) => {
       return response.json();
     }).then((user: any) => {
       if(!!user.id) {
-        this.state.signupSucceed = true;
-        this.state.id = user.id;
       }
     });
   }
   componentDidMount() {
-    document.title = "www.onplatforms.net";
+    console.log("mount signup");
+    document.title = "Signup accounts.onplatforms.net";
+    this.setState({
+      userNameRef: this.refs['userName'] as UserName,
+      emailRef: this.refs['email'] as Email,
+      passwordRef: this.refs['password'] as Password
+    } as SignupState)
   }
 }

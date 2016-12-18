@@ -1,4 +1,6 @@
 import * as React from "react";
+import { render } from 'react-dom'
+import { Router, Route, Link, browserHistory } from 'react-router';
 import {Header} from "./Header";
 import {Signin} from "./Signin";
 import {Signup} from "./Signup";
@@ -16,13 +18,13 @@ export class Main extends React.Component<MainProps, MainState> {
   render() {
     return (
       <div>
-        <Header/>
-        <Signup />
+        <Header />
       </div>
     );
   }
 
   componentDidMount() {
-    document.title = "Signin accounts.onplatforms.net";
+    console.log("mount main");
+    document.title = "accounts.onplatforms.net";
   }
 }

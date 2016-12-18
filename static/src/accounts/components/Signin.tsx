@@ -1,11 +1,14 @@
 import * as React from "react";
+import {Header} from "./Header";
+import {Email} from "./Email";
+import {Password} from "./Password";
+import {Signup} from "./Signup";
 
 interface SigninProps {
 }
 interface SigninState {
-  email: string
-  password: string
-  isValidEmail: boolean
+  emailRef: Email
+  passwordRef: Password
 }
 export class Signin extends React.Component<SigninProps, SigninState> {
   constructor(props: SigninProps) {
@@ -14,36 +17,23 @@ export class Signin extends React.Component<SigninProps, SigninState> {
   }
   render() {
     return (
-      <div className="container on-contents">
-        <div className="column is-half is-offset-one-quarter">
-          <label className="label">Email</label>
-          <p className="control has-icon has-icon-right">
-            <input className="input" type="text" placeholder="Email input" value={this.state.email} onChange={e => this.changeEmail(e)} />
-            <i className="fa fa-warning"></i>
-            {this.state.isValidEmail ? <span className="help is-success">This Email is valid</span>: ""}
-          </p>
-          <label className="label">Password</label>
-          <p className="control has-icon">
-            <input className="input" type="password" placeholder="Password" value={this.state.password} />
-            <i className="fa fa-lock"></i>
-          </p>
-          <p className="control">
-            <button className="button is-primary" onClick={e => this.signin(e)}>Signin</button>
-          </p>
-        </div>
-      </div>
+      <Signup signupMode={false} />
     );
   }
-  private mailRegexp = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-  changeEmail(e: any) {
-    this.setState({
-      email: e.target.value,
-      isValidEmail: this.mailRegexp.test(e.target.value)
-    } as SigninState);
+  private isValidEmail() {
+    return this.state.emailRef && this.state.emailRef.state.isValidEmail;
+  }
+  private isValidPassword() {
+    return this.state.passwordRef && this.state.passwordRef.state.isValidPassword;
   }
   signin(e: any) {
   }
   componentDidMount() {
-    document.title = "www.onplatforms.net";
+    console.log("mount signin");
+    document.title = "Signin accounts.onplatforms.net";
+    this.setState({
+      emailRef: this.refs['email'] as Email,
+      passwordRef: this.refs['password'] as Password
+    } as SigninState)
   }
 }
