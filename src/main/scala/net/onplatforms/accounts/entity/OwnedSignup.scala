@@ -7,3 +7,5 @@ case class OwnedSignup(
 ) {
   require(password.length >= 8)
 }
+
+case class OwnedSignupResult(id: String)

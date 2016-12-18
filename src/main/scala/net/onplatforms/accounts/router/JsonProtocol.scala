@@ -8,6 +8,5 @@ import spray.json._
 trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val TwitterSighupFormat = jsonFormat0(TwitterSighup)
   implicit val OwnedSignupFormat = jsonFormat3(OwnedSignup)
-  implicit val SignupFormat = jsonFormat2(Signup)
-  implicit val SignupResultFormat = jsonFormat1(SignupResult)
+  implicit val OwnedSignupResultFormat = jsonFormat1(OwnedSignupResult)
 }

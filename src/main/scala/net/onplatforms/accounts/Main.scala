@@ -3,7 +3,7 @@ package net.onplatforms.accounts
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{ActorRefFactory, ActorSystem, Props}
-import akka.event.Logging
+import akka.event.{Logging, LoggingAdapter}
 import akka.event.Logging._
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
@@ -28,7 +28,7 @@ object Main {
       val namespace: String = Main.namespace
       val version: String = systemConfig.getString("version")
       implicit val system: ActorSystem = ActorSystem("accounts-system", this.config)
-      val logger = Logging(system.eventStream, getClass)
+      val logger: LoggingAdapter = Logging(system.eventStream, getClass)
       implicit val materializer = ActorMaterializer()
       val blockingContext: ExecutionContext =
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
@@ -42,8 +42,7 @@ object Main {
 
     val mapping = Seq(
       get(path("")(indexRouter.handle)),
-      post(path("signup")(signupRouter.handle))
-
+      signupRouter.routes
     ).foldLeft[Route](reject)(_ ~ _)
 
     val route = logRequest("access", InfoLevel)(mapping)

@@ -76,18 +76,16 @@ export class Signup extends React.Component<SignupProps, SignupState> {
     } as SignupState);
   }
   signup(e: any) {
-    fetch('https://accounts.onplatforms.net/signup', {
+    fetch('//accounts.onplatforms.net/signup/owned', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ownedSignupOpt: {
-          userName: this.state.userName,
-          email: this.state.email,
-          password: this.state.password,
-        }
+        userName: this.state.userName,
+        email: this.state.email,
+        password: this.state.password,
       })
     }).then((response: any) => {
       return response.json();

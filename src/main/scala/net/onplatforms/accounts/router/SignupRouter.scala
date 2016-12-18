@@ -28,30 +28,45 @@ class SignupRouter(
 ) extends JsonProtocol {
   implicit private val timeout = Timeout(2.seconds)
   private val authenticationService = env.authenticationService(env.system)
-
-  def handle: Route = entity(as[Signup]) { signup =>
-    if (signup.ownedSignupOpt.nonEmpty) {
-      val owned = signup.ownedSignupOpt.get
-      val protocol = AuthenticationService.Protocol.Owned(owned.userName, owned.email, owned.password)
-      onComplete(askOwned(protocol)) {
-        case Success(user) =>
-          val result = SignupResult(user.id)
-          setCookie(HttpCookie("sid", UUID.randomUUID.toString, // TODO: uuid persist
-            maxAge = Option(2592000), domain = Option(".onplatforms.net"), path = Option("/"))) {
-            complete(result)
-          }
-        case Failure(t) => failWith(t)
+  def routes = {
+    post {
+      path("signup" / Segment) {
+        case "owned" => ownedSignup
+        case _ => reject
       }
-    } else if (signup.twitterSignupOpt.nonEmpty) {
-      reject
-    } else {
-      reject
+    } ~
+    post {
+      path("signin" / Segment) {
+        case "owned" => ownedSignin
+        case "twitter" => twitterSignin
+        case _ => reject
+      }
+    } ~
+    post {
+      path("signout") {
+        deleteCookie("sid", ".onplatforms.net", "/")(complete(""))
+      }
     }
   }
+
+  private def ownedSignup = entity(as[OwnedSignup]) { signup =>
+    val protocol = AuthenticationService.Protocol.Owned(signup.userName, signup.email, signup.password)
+    onComplete(askOwned(protocol)) {
+      case Success(user) =>
+        val result = OwnedSignupResult(user.id)
+        setCookie(HttpCookie("sid", UUID.randomUUID.toString, // TODO: uuid persist
+          maxAge = Option(2592000), domain = Option(".onplatforms.net"), path = Option("/"))) {
+          complete(result)
+        }
+      case Failure(t) => failWith(t)
+    }
+  }
+  private def ownedSignin = reject
+  private def twitterSignin = reject
+  private def twitterCallback = reject
+
   private def askOwned(owned: AuthenticationService.Protocol.Owned) =
     authenticationService.ask(owned).mapTo[User]
-
-  def twitterCallback = reject
 
   private def htmlEntity(html: String) =
     HttpEntity(ContentTypes.`text/html(UTF-8)`, html)
