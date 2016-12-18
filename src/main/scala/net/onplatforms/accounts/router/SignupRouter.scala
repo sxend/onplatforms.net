@@ -32,21 +32,21 @@ class SignupRouter(
     post {
       path("signup" / Segment) {
         case "owned" => ownedSignup
-        case _ => reject
+        case _       => reject
       }
     } ~
-    post {
-      path("signin" / Segment) {
-        case "owned" => ownedSignin
-        case "twitter" => twitterSignin
-        case _ => reject
+      post {
+        path("signin" / Segment) {
+          case "owned"   => ownedSignin
+          case "twitter" => twitterSignin
+          case _         => reject
+        }
+      } ~
+      post {
+        path("signout") {
+          deleteCookie("sid", ".onplatforms.net", "/")(complete(""))
+        }
       }
-    } ~
-    post {
-      path("signout") {
-        deleteCookie("sid", ".onplatforms.net", "/")(complete(""))
-      }
-    }
   }
 
   private def ownedSignup = entity(as[OwnedSignup]) { signup =>
