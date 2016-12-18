@@ -9,4 +9,4 @@ aws s3 sync ./static/dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE
 aws s3 sync ./static/dist/${APP_PROFILE}/ s3://cdn.onplatforms.net/${APP_PROFILE}/latest/static/
 sed -e "s/<APP_PROFILE>/${APP_PROFILE}/" \
     -e "s/<LISTEN_PORT>/${LISTEN_PORT}/" \
-    -e "s/<APP_VERSION>/${APP_VERSION}/" ./README.md
+    -e "s/<APP_VERSION>/${APP_VERSION}/" ./README.md | tail
