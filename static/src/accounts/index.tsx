@@ -11,7 +11,7 @@ import {Signin} from "./components/Signin";
 import {Signup} from "./components/Signup";
 
 utils.setViewport('width=device-width,initial-scale=1.0');
-const PREFIX= "/test/accounts";
+const PREFIX= "";
 
 ReactDOM.render((
   <Router history={browserHistory}>
