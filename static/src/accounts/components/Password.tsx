@@ -22,7 +22,7 @@ export class Password extends React.Component<PasswordProps, PasswordState> {
         <label className="label">Password</label>
         <p className="control has-icon">
           <input className="input" type="password" placeholder="Password" value={this.state.password} onChange={e => this.onChange(e)} />
-          <i className="fa fa-lock"></i>
+          <i className={"fa " + (this.state.isValid ? "fa-check": "fa-lock")}></i>
         </p>
       </div>
     )

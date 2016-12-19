@@ -20,9 +20,9 @@ export class Email extends React.Component<EmailProps, EmailState> {
     return (
       <div className="column is-half is-offset-one-quarter">
         <label className="label">Email</label>
-        <p className="control has-icon has-icon-right">
+        <p className="control has-icon">
           <input className="input" type="text" placeholder="Email input" value={this.state.email} onChange={e => this.onChange(e)} />
-          <i className="fa fa-warning"></i>
+          <i className={"fa " + (this.state.isValid ? "fa-check" : "fa-envelope")}></i>
           {this.state.isValid ? <span className="help is-success">This Email is valid</span>: ""}
         </p>
       </div>

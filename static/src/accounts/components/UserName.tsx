@@ -20,9 +20,9 @@ export class UserName extends React.Component<UserNameProps, UserNameState> {
     return (
       <div className="column is-half is-offset-one-quarter">
         <label className="label">UserName</label>
-        <p className="control has-icon has-icon-right">
+        <p className="control has-icon">
           <input className="input" type="text" placeholder="UserName input" value={this.state.userName} onChange={e => this.onChange(e)} />
-          <i className="fa fa-warning"></i>
+          <i className={"fa " + (this.state.isValid ? "fa-check" : "fa-address-card-o")}></i>
           {this.state.isValid ? <span className="help is-success">This UserName is valid</span>: ""}
         </p>
       </div>
