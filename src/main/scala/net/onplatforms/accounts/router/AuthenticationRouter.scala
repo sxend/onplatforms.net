@@ -46,10 +46,7 @@ class AuthenticationRouter(
     val protocol = AuthenticationService.Protocol.Owned(signup.userName, signup.email, signup.password)
     onComplete(askOwned(protocol)) {
       case Success(user) => withSessionId { sid =>
-        setToken(sid) {
-          val result = OwnedSignupResult(user.id)
-          complete(result)
-        }
+        setToken(sid)(complete(OwnedSignupResult(user.id)))
       }
       case Failure(t) => failWith(t)
     }
