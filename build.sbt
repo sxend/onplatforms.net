@@ -10,8 +10,7 @@ scalaVersion := "2.11.8"
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots"),
-  "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/",
-  Resolver.bintrayRepo("iheartradio","maven")
+  "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 )
 
 val dependencies =  {
@@ -80,10 +79,6 @@ lazy val slick = TaskKey[Seq[File]]("slick-gen")
 
 
 publishMavenStyle := false
-
-bintrayRepository := {
-  if (version.value.matches("^[0-9]+\\.[0-9]+\\.[0-9]+$")) "releases" else "snapshots"
-}
 
 licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
