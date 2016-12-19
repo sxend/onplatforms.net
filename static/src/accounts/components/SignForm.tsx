@@ -39,11 +39,11 @@ export class SignForm extends React.Component<SignFormProps, SignFormState> {
                    onChange={(value, valid) => this.onChangeEmail(value, valid)}/>
             <Password ref="password"
                       onChange={(value, valid) => this.onChangePassword(value, valid)}/>
-            <p className="control">
+            <div className="control column is-half is-offset-one-quarter">
               <button className={
                 "button is-primary " + (this.submitEnabled())
               } onClick={e => this.submit(e)} value="owned">{this.props.signupMode ? "Signup" : "Signin"}</button>
-            </p>
+            </div>
           </div>
         </div>
       </div>
