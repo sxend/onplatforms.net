@@ -3,10 +3,12 @@ import 'whatwg-fetch';
 import 'promise';
 import {Header} from "./Header";
 
-interface UserNameProps {}
+interface UserNameProps {
+  onChange: (userName: string, isValid: boolean) => void
+}
 interface UserNameState {
   userName: string
-  isValidUserName: boolean
+  isValid: boolean
 }
 
 export class UserName extends React.Component<UserNameProps, UserNameState> {
@@ -19,19 +21,21 @@ export class UserName extends React.Component<UserNameProps, UserNameState> {
       <div className="column is-half is-offset-one-quarter">
         <label className="label">UserName</label>
         <p className="control has-icon has-icon-right">
-          <input className="input" type="text" placeholder="UserName input" value={this.state.userName} onChange={e => this.changeUserName(e)} />
+          <input className="input" type="text" placeholder="UserName input" value={this.state.userName} onChange={e => this.onChange(e)} />
           <i className="fa fa-warning"></i>
-          {this.state.isValidUserName ? <span className="help is-success">This UserName is valid</span>: ""}
+          {this.state.isValid ? <span className="help is-success">This UserName is valid</span>: ""}
         </p>
       </div>
     )
   }
-  private userNameRegexp = /^[\S]{0,32}$/i;
-  changeUserName(e: any) {
-    let userName: UserName = (this.refs['userName'] as UserName);
+  private userNameRegexp = /^[\S]{4,32}$/i;
+  onChange(e: any) {
+    const userName = e.target.value;
+    const isValid = this.userNameRegexp.test(userName);
+    this.props.onChange(userName, isValid);
     this.setState({
-      userName: e.target.value,
-      isValidUserName: this.userNameRegexp.test(e.target.value)
+      userName: userName,
+      isValid: isValid
     } as UserNameState);
   }
 }

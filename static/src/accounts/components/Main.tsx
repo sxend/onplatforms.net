@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import { Router, Route, Link, browserHistory } from 'react-router';
 import {Header} from "./Header";
 import {Signin} from "./Signin";
-import {Signup} from "./Signup";
+import {SignForm} from "./SignForm";
 
 interface MainProps {
 }
@@ -24,7 +24,6 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   componentDidMount() {
-    console.log("mount main");
     document.title = "accounts.onplatforms.net";
   }
 }

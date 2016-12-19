@@ -1,22 +1,26 @@
 package net.onplatforms.accounts
 
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{ActorRefFactory, ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.event.Logging._
 import akka.http.scaladsl._
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.headers.{HttpCookie, RawHeader}
+import akka.http.scaladsl.server.Directives.{pathPrefix, _}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
+import net.onplatforms.accounts.provider.SessionProvider
+import net.onplatforms.accounts.router.AuthenticationRouter
 import net.onplatforms.accounts.service.AuthenticationService
 import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.lib.rdb.MySQL
 
 import scala.concurrent.ExecutionContext
 
-object Main {
+object Main extends AnyRef with SessionProvider {
   val config: Config = ConfigFactory.load
   val namespace = "net.onplatforms.accounts"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
@@ -36,18 +40,24 @@ object Main {
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val authenticationService = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
       val indexRouter = new router.IndexRouter(this)
-      val signupRouter = new router.SignupRouter(this)
+      val signupRouter = new router.AuthenticationRouter(this)
     }
     import env._
 
-    val mapping = Seq(
-      get(path("")(indexRouter.handle)),
-      signupRouter.routes
-    ).foldLeft[Route](reject)(_ ~ _)
+    val mapping = withDefaultSessionId { sid =>
+      pathPrefix("api" / "v1") {
+        csrfProtect {
+          signupRouter.routes
+        } ~
+          tokenEndpoint
+      } ~
+        get(indexRouter.handle)
+    } ~ reject
 
     val route = logRequest("access", InfoLevel)(mapping)
     Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
   }
+
   object ActorNames {
     case class Generator(basename: String) {
       private val seqNr = new AtomicInteger(0)

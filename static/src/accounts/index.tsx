@@ -15,9 +15,9 @@ const PREFIX= "";
 
 ReactDOM.render((
   <Router history={browserHistory}>
-    <Route path={PREFIX + "/"} component={Main} />
-    <Route path={PREFIX + "/signup"} component={Signup} key=""/>
+    <Route path={PREFIX + "/"} component={Signup} />
     <Route path={PREFIX + "/signin"} component={Signin} />
+    <Route path={PREFIX + "/signup"} component={Signup} />
   </Router>
 ), document.getElementById("main-contents"));
 

@@ -3,10 +3,12 @@ import 'whatwg-fetch';
 import 'promise';
 import {Header} from "./Header";
 
-interface PasswordProps {}
+interface PasswordProps {
+  onChange: (password: string, valid: boolean) => void
+}
 interface PasswordState {
   password: string
-  isValidPassword: boolean
+  isValid: boolean
 }
 
 export class Password extends React.Component<PasswordProps, PasswordState> {
@@ -19,17 +21,20 @@ export class Password extends React.Component<PasswordProps, PasswordState> {
       <div className="column is-half is-offset-one-quarter">
         <label className="label">Password</label>
         <p className="control has-icon">
-          <input className="input" type="password" placeholder="Password" value={this.state.password} onChange={e => this.changePassword(e)} />
+          <input className="input" type="password" placeholder="Password" value={this.state.password} onChange={e => this.onChange(e)} />
           <i className="fa fa-lock"></i>
         </p>
       </div>
     )
   }
   private passwordRegexp = /^[\S]{8,1024}$/i;
-  changePassword(e: any) {
+  onChange(e: any) {
+    const password = e.target.value;
+    const isValid = this.passwordRegexp.test(password);
+    this.props.onChange(password, isValid);
     this.setState({
-      password: e.target.value,
-      isValidPassword: this.passwordRegexp.test(e.target.value)
+      password: password,
+      isValid: isValid
     } as PasswordState);
   }
 }

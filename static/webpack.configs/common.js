@@ -1,7 +1,15 @@
 
-let webpack = require('webpack');
-let path = require('path');
-
+const webpack = require('webpack');
+const path = require('path');
+const env = process.env['npm_config_env'] || "production";
+const ppOpt = JSON.stringify(({
+  "production": {
+    API_URL: "//accounts.onplatforms.net"
+  },
+  "local": {
+    API_URL: "//accounts.onplatforms.local:9091"
+  }
+})[env]);
 module.exports = {
   config: function config(name) {
     return {
@@ -19,7 +27,7 @@ module.exports = {
         loaders: [{
           test: /\.tsx$/,
           exclude: /(node_modules|bower_components)/,
-          loader: 'ts-loader'
+          loader: 'ts-loader!preprocess?' + ppOpt
         },
           { test: /\.html$/, loader: "html-loader" },
           { test: /\.css$/, loader: "style-loader!css-loader" },

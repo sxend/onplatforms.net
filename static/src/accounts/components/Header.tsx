@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Router, Route, Link, browserHistory } from 'react-router';
+import {api} from "../api";
 
 export interface HeaderState {
   isMenuToggleOn: boolean;
@@ -33,9 +34,19 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
               </span>
               <div className={"nav-right nav-menu" + (this.state.isMenuToggleOn ? " is-active" : "")}>
                 <span className="nav-item">
-                  <Link to="/test/accounts/signup" className={"button is-dark is-inverted" + (
+                  <Link to="/signin" className={"button is-dark is-inverted" + (
+                    this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
+                  )}>Signin</Link>
+                </span>
+                <span className="nav-item">
+                  <Link to="/signup" className={"button is-dark is-primary" + (
                     this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
                   )}>Signup</Link>
+                </span>
+                <span className="nav-item">
+                  <a onClick={e => this.signout(e)} className={"button is-dark is-danger" + (
+                    this.state.isMenuToggleOn ? " on-header--item__large" : "on-header--item"
+                  )}>Signout</a>
                 </span>
                 <span></span>
               </div>
@@ -45,7 +56,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       </section>
     );
   }
+  private signout(e: any) {
+    api.signout();
+  }
   componentDidMount() {
-    console.log("mount header");
   }
 }
