@@ -3,7 +3,7 @@
 RDB_USER=""
 RDB_PASS=""
 
-if [ ""${CIRCLECI} -eq "true" ]; then
+if [ ""${CIRCLECI} = "true" ]; then
     RDB_USER=ubuntu
     RDB_PASS=""
 else
