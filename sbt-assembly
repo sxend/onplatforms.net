@@ -1,7 +1,17 @@
 #!/bin/bash
 
-RDB_USER=$(aws s3 cp s3://internal-storage.arimit.su/internal/datastore/rdb/user.name - ) && \
-RDB_PASS=$(aws s3 cp s3://internal-storage.arimit.su/internal/datastore/rdb/user.pass - ) && \
+RDB_USER=""
+RDB_PASS=""
+
+if [ ""${CIRCLECI} -eq "true" ]; then
+    RDB_USER=ubuntu
+    RDB_PASS=""
+else
+    RDB_USER=$(aws s3 cp s3://internal-storage.arimit.su/internal/datastore/rdb/user.name - )
+    RDB_PASS=$(aws s3 cp s3://internal-storage.arimit.su/internal/datastore/rdb/user.pass - )
+fi
+
+
 sbt -Dflyway.schemas=accounts.onplatforms.net \
     -Dflyway.locations="accounts/schema" \
     -Dflyway.user=${RDB_USER} \
