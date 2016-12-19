@@ -12,8 +12,10 @@ dependencies:
     - envsubst < .aws/config.template > ~/.aws/config
     - mkdir -p ~/.docker && aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
     - nvm install v6.9.1 && nvm alias default v6.9.1
+    - curl -s https://s3-ap-northeast-1.amazonaws.com/public.arimit.su/internal/datastore/scripts/rdb.sh | sh -s -- accounts.onplatforms.net
+    - sleap 10
   override:
-    - sbt "set version := \"${APP_VERSION}\"" assembly
+    - ./sbt-assembly
     - ./scripts/build-profile.sh www 9090 ${APP_VERSION}
     - ./scripts/build-profile.sh accounts 9091 ${APP_VERSION}
     - cd static && npm install && npm run build

@@ -14,7 +14,7 @@ resolvers ++= Seq(
   Resolver.bintrayRepo("iheartradio","maven")
 )
 
-libraryDependencies ++= {
+val dependencies =  {
   val akkaHttpVersion = "10.0.0"
   val spec2Version = "3.8.4"
   val slickVersion = "3.1.1"
@@ -22,6 +22,7 @@ libraryDependencies ++= {
   Seq(
     "com.typesafe.slick" %% "slick" % slickVersion,
     "com.typesafe.slick" %% "slick-hikaricp" % slickVersion excludeAll ExclusionRule(organization = "com.zaxxer", name = "HikariCP-java6"),
+    "com.typesafe.slick" %% "slick-codegen" % slickVersion,
     "joda-time" % "joda-time" % "2.7",
     "org.joda" % "joda-convert" % "1.7",
     "mysql" % "mysql-connector-java" % "6.0.5",
@@ -46,6 +47,37 @@ libraryDependencies ++= {
     "org.scalariform" %% "scalariform" % "0.1.8" % "compile"
   )
 }
+
+val RDB_USER = Option(System.getenv("RDB_USER"))
+  .orElse(Option(System.getProperty("sbt.RDB_USER"))).getOrElse("0.0.0.0")
+
+val RDB_PASS = Option(System.getenv("RDB_PASS"))
+  .orElse(Option(System.getProperty("sbt.RDB_PASS"))).getOrElse("3306")
+
+
+lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runner in Compile, streams) map { (dir, cp, r, s) =>
+  val outputDir = new File("src/main/scala").absolutePath
+  val url = "jdbc:mysql://localhost:3306/accounts.onplatforms.net?useSSL=false&nullNamePatternMatchesAll=true"
+  val jdbcDriver = "com.mysql.cj.jdbc.Driver"
+  val slickDriver = "slick.driver.MySQLDriver"
+  val pkg = "net.onplatforms.accounts.io"
+  r.run("slick.codegen.SourceCodeGenerator", cp.files, Array(slickDriver, jdbcDriver, url, outputDir, pkg, RDB_USER, RDB_PASS), Logger.Null)
+  val fname = outputDir + "/Tables.scala"
+  Seq(file(fname))
+}
+
+lazy val mainProject = Project(
+  id="zero",
+  base=file("."),
+  settings = Defaults.coreDefaultSettings ++ Seq(
+    scalaVersion := "2.11.8",
+    libraryDependencies ++= dependencies,
+    slick := { slickCodeGenTask.value } // register manual sbt command
+  )
+)
+
+lazy val slick = TaskKey[Seq[File]]("slick-gen")
+
 
 publishMavenStyle := false
 
