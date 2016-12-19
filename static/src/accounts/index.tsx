@@ -1,4 +1,5 @@
 import "../../node_modules/bulma/css/bulma.css";
+import "font-awesome-webpack";
 import "./styles/index.scss";
 
 import * as React from "react";
