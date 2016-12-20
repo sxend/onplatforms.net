@@ -53,5 +53,5 @@ sudo docker run --name=${APP_PROFILE}.onplatforms.net -d -it \
 
 #### use deploy script
 ```
-curl -s https://s3-ap-northeast-1.amazonaws.com/public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh | sh -s -- <APP_PROFILE> <LISTEN_PORT> <APP_VERSION>
+curl -s https://s3-ap-northeast-1.amazonaws.com/public.onplatforms.net/onplatforms.net/app/scripts/deploy.sh | sh -s -- <APP_PROFILE> <LISTEN_PORT> <APP_VERSION>
 ```

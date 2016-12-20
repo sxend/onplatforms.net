@@ -1,7 +1,7 @@
 
 organization := "net.onplatforms"
 
-name := "zero"
+name := "app"
 
 version := "0.0.1-SNAPSHOT"
 
@@ -65,7 +65,7 @@ def slickCodeGenTask(cp: Seq[Attributed[File]], r: ScalaRun) = {
 }
 
 lazy val mainProject = Project(
-  id="zero",
+  id="app",
   base=file("."),
   settings = Defaults.coreDefaultSettings ++ Seq(
     scalaVersion := "2.11.8",
@@ -104,4 +104,4 @@ testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/Sc
 
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/ScalaTest-reports/unit")
 
-assemblyJarName in assembly := s"zero.jar"
+assemblyJarName in assembly := s"app.jar"

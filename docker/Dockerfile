@@ -14,7 +14,7 @@ ARG APP_PROFILE
 
 ENV APP_PROFILE $APP_PROFILE
 
-ADD ./target/scala-2.11/zero.jar /opt/zero.jar
+ADD ./target/scala-2.11/app.jar /opt/app.jar
 
 ADD ./docker/bootstrap.sh /opt/bootstrap.sh
 

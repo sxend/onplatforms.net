@@ -3,8 +3,8 @@
 APP_PROFILE=$1
 APP_VERSION=$2
 
-ARCHIVE_FILE_NAME=zero.zip
-S3KEY=zero/${APP_VERSION}/eb/${ARCHIVE_FILE_NAME}
+ARCHIVE_FILE_NAME=app.zip
+S3KEY=app/${APP_VERSION}/eb/${ARCHIVE_FILE_NAME}
 
 # Create ElasticBeanstalk version file by zip command
 cd eb/

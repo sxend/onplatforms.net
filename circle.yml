@@ -21,7 +21,7 @@ deployment:
   publish:
     branch: master
     commands:
-      - aws s3 cp ./target/scala-2.11/zero.jar s3://internal-storage.onplatforms.net/zero/${APP_VERSION}/jars/
+      - aws s3 cp ./target/scala-2.11/app.jar s3://internal-storage.onplatforms.net/app/${APP_VERSION}/jars/
       - ./scripts/release-profile.sh www 9090 ${APP_VERSION}
       - ./scripts/release-profile.sh accounts 9091 ${APP_VERSION}
-      - aws s3 cp ./scripts/deploy.sh s3://public.onplatforms.net/onplatforms.net/zero/scripts/deploy.sh
+      - aws s3 cp ./scripts/deploy.sh s3://public.onplatforms.net/onplatforms.net/app/scripts/deploy.sh
