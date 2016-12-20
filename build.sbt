@@ -10,6 +10,8 @@ scalaVersion := "2.11.8"
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots"),
+  Resolver.bintrayRepo("sxend", "releases"),
+  Resolver.bintrayRepo("sxend", "snapshots"),
   "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 )
 
@@ -19,6 +21,7 @@ val dependencies =  {
   val slickVersion = "3.1.1"
   val log4jVersion = "2.7"
   Seq(
+    "net.onplatforms" %% "datasource" % "0.0.1-b10-16a8ea5e997dc7e2e1bfc84ad0e4b50545e718cc",
     "com.typesafe.slick" %% "slick" % slickVersion,
     "com.typesafe.slick" %% "slick-hikaricp" % slickVersion excludeAll ExclusionRule(organization = "com.zaxxer", name = "HikariCP-java6"),
     "com.typesafe.slick" %% "slick-codegen" % slickVersion,
@@ -77,7 +80,6 @@ lazy val mainProject = Project(
 )
 
 lazy val slick = TaskKey[Seq[File]]("slick-gen")
-
 
 publishMavenStyle := false
 
