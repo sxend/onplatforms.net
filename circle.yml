@@ -14,7 +14,7 @@ dependencies:
     - nvm install v6.9.1 && nvm alias default v6.9.1
     - sleep 10
   override:
-    - ./sbt-assembly
+    - ./sbt-build-all
     - ./scripts/build-profile.sh www 9090 ${APP_VERSION}
     - ./scripts/build-profile.sh accounts 9091 ${APP_VERSION}
     - cd static && npm install && npm run build
