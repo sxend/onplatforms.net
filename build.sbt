@@ -54,7 +54,9 @@ val RDB_PASS = Option(System.getenv("RDB_PASS"))
   .orElse(Option(System.getProperty("sbt.RDB_PASS"))).getOrElse("3306")
 
 
-lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runner in Compile, streams) map { (dir, cp, r, s) =>
+lazy val slickCodeGenTask = {
+  val cp = (dependencyClasspath in Compile).value
+  val r = (runner in Compile).value
   val outputDir = new File("src/main/scala").absolutePath
   val url = "jdbc:mysql://localhost:3306/accounts.onplatforms.net?useSSL=false&nullNamePatternMatchesAll=true"
   val jdbcDriver = "com.mysql.cj.jdbc.Driver"
@@ -71,7 +73,7 @@ lazy val mainProject = Project(
   settings = Defaults.coreDefaultSettings ++ Seq(
     scalaVersion := "2.11.8",
     libraryDependencies ++= dependencies,
-    slick := { slickCodeGenTask.value } // register manual sbt command
+    slick := { slickCodeGenTask } // register manual sbt command
   )
 )
 
