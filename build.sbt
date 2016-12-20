@@ -53,16 +53,15 @@ val RDB_USER = Option(System.getenv("RDB_USER"))
 val RDB_PASS = Option(System.getenv("RDB_PASS"))
   .orElse(Option(System.getProperty("sbt.RDB_PASS"))).getOrElse("3306")
 
-
-lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runner in Compile, streams) map { (dir, cp, r, s) =>
-  val outputDir = new File("src/main/scala").absolutePath
-  val url = "jdbc:mysql://localhost:3306/accounts.onplatforms.net?useSSL=false&nullNamePatternMatchesAll=true"
-  val jdbcDriver = "com.mysql.cj.jdbc.Driver"
+def slickCodeGenTask(cp: Seq[Attributed[File]], r: ScalaRun) = {
   val slickDriver = "slick.driver.MySQLDriver"
-  val pkg = "net.onplatforms.accounts.io"
-  r.run("slick.codegen.SourceCodeGenerator", cp.files, Array(slickDriver, jdbcDriver, url, outputDir, pkg, RDB_USER, RDB_PASS), Logger.Null)
-  val fname = outputDir + "/Tables.scala"
-  Seq(file(fname))
+  val jdbcDriver = "com.mysql.cj.jdbc.Driver"
+  val url = "jdbc:mysql://localhost:3306/accounts.onplatforms.net?useSSL=false&nullNamePatternMatchesAll=true"
+  val outputDir = new File("src/main/scala").absolutePath
+  val pkg = "net.onplatforms.accounts.io.rdb"
+  val args = Array(slickDriver, jdbcDriver, url, outputDir, pkg, RDB_USER, RDB_PASS)
+  r.run("slick.codegen.SourceCodeGenerator", cp.files, args, Logger.Null)
+  Seq(file(outputDir + "/Tables.scala"))
 }
 
 lazy val mainProject = Project(
@@ -71,7 +70,9 @@ lazy val mainProject = Project(
   settings = Defaults.coreDefaultSettings ++ Seq(
     scalaVersion := "2.11.8",
     libraryDependencies ++= dependencies,
-    slick := { slickCodeGenTask.value } // register manual sbt command
+    slick := {
+      slickCodeGenTask((dependencyClasspath in Compile).value, (runner in Compile).value)
+    } // register manual sbt command
   )
 )
 

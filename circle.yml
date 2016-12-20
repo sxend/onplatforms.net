@@ -12,7 +12,6 @@ dependencies:
     - envsubst < .aws/config.template > ~/.aws/config
     - mkdir -p ~/.docker && aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
     - nvm install v6.9.1 && nvm alias default v6.9.1
-    - sleep 10
   override:
     - ./sbt-build-all
     - ./scripts/build-profile.sh www 9090 ${APP_VERSION}
