@@ -10,6 +10,7 @@ dependencies:
     - mkdir -p ~/.aws
     - envsubst < .aws/credentials.template > ~/.aws/credentials
     - envsubst < .aws/config.template > ~/.aws/config
+    - mkdir -p ~/.bintray && envsubst < .credentials > ~/.bintray/.credentials
     - mkdir -p ~/.docker && aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
     - nvm install v6.9.1 && nvm alias default v6.9.1
   override:
