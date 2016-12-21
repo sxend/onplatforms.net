@@ -39,16 +39,16 @@ class AuthenticationService(
     val action = findOneSignupedUserAction(email).flatMap {
       case Some(signupUser) => findUser(signupUser.userId)
       case _ =>
-        registerUsers(UUID.randomUUID().toString, email, password, userName)
+        createUsers(email, password, userName)
     }
     db.run(action.transactionally)
   }
-  private def registerUsers(id: String, email: String, password: String, userName: String) =
-    DBIO.seq(
-      registerUserAction(id),
-      registerSignupUserAction(email, passwordHashing(email, password), userName, id)
-    ).map(_ => NewUser(id, email, userName))
-
+  private def createUsers[A](email: String, password: String, userName: String) = {
+    createNewUserAction.flatMap { userId =>
+      createSignupUserAction(email, passwordHashing(email, password), userName, userId)
+        .map(_ => NewUser(userId, email, userName))
+    }
+  }
   private def findUser(id: String) =
     findOneUserAction(id).map {
       case Some(user) => AlreadyExists()
@@ -58,9 +58,11 @@ class AuthenticationService(
     Tables.SignupUsers.filter(_.email === email).result.map(_.headOption)
   private def findOneUserAction(id: String) =
     Tables.Users.filter(_.id === id).result.map(_.headOption)
-  private def registerUserAction(id: String) =
-    Tables.Users.map(_.id) += id
-  private def registerSignupUserAction(email: String, passwordHash: String, userName: String, userId: String) =
+  private def createNewUserAction = {
+    val id = UUID.randomUUID().toString
+    (Tables.Users.map(_.id) returning Tables.Users.map(_.id)) += (id)
+  }
+  private def createSignupUserAction(email: String, passwordHash: String, userName: String, userId: String) =
     Tables.SignupUsers.map(u => (u.email, u.passwordHash, u.userName, u.userId)) += (email, passwordHash, userName, userId)
 
   @tailrec
