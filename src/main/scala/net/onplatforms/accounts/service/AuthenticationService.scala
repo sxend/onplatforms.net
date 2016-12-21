@@ -47,9 +47,8 @@ class AuthenticationService(
     DBIO.seq(
       registerUserAction(id),
       registerSignupUserAction(email, passwordHashing(email, password), userName, id)
-    ).map {
-        _ => NewUser(id, email, userName)
-      }
+    ).map(_ => NewUser(id, email, userName))
+
   private def findUser(id: String) =
     findOneUserAction(id).map {
       case Some(user) => AlreadyExists()
