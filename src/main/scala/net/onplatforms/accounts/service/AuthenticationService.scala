@@ -36,18 +36,21 @@ class AuthenticationService(
       signup(userName, email, password).pipeTo(sender())
   }
   private def signup(userName: String, email: String, password: String): Future[SignupResult] = {
-    val action = findOneSignupedUserAction(email).flatMap {
-      case Some(signupUser) => findUser(signupUser.userId)
-      case _ =>
-        createUsers(email, password, userName)
-    }
+    val action = for {
+      signupUserOpt <- findOneSignupedUserAction(email)
+      result <- signupUserOpt match {
+        case Some(signupUser) => findUser(signupUser.userId)
+        case _                => createUsers(email, password, userName)
+      }
+    } yield result
+
     db.run(action.transactionally)
   }
   private def createUsers[A](email: String, password: String, userName: String) = {
-    createNewUserAction.flatMap { userId =>
-      createSignupUserAction(email, passwordHashing(email, password), userName, userId)
-        .map(_ => NewUser(userId, email, userName))
-    }
+    for {
+      userId <- createNewUserAction
+      _ <- createSignupUserAction(email, passwordHashing(email, password), userName, userId)
+    } yield NewUser(userId, email, userName)
   }
   private def findUser(id: String) =
     findOneUserAction(id).map {
