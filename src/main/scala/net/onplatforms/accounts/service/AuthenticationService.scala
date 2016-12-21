@@ -7,16 +7,13 @@ import akka.actor.Actor
 import akka.event.LoggingAdapter
 import akka.pattern._
 import com.typesafe.config.Config
-import net.onplatforms.accounts.entity.User
 import net.onplatforms.accounts.io.rdb.Tables
-import net.onplatforms.accounts.io.rdb.Tables._
 import net.onplatforms.lib.rdb.MySQL
 import slick.driver.MySQLDriver.api._
 import org.apache.commons.codec.digest.DigestUtils
 
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class AuthenticationService(
   env: {
@@ -63,7 +60,7 @@ class AuthenticationService(
     Tables.Users.filter(_.id === id).result.map(_.headOption)
   private def createNewUserAction = {
     val id = UUID.randomUUID().toString
-    (Tables.Users.map(_.id) += (id)).map(_ => id)
+    (Tables.Users.map(_.id) += id).map(_ => id)
   }
   private def createSignupUserAction(email: String, passwordHash: String, userName: String, userId: String) =
     Tables.SignupUsers.map(u => (u.email, u.passwordHash, u.userName, u.userId)) += (email, passwordHash, userName, userId)
