@@ -63,7 +63,7 @@ class AuthenticationService(
     Tables.Users.filter(_.id === id).result.map(_.headOption)
   private def createNewUserAction = {
     val id = UUID.randomUUID().toString
-    (Tables.Users.map(_.id) returning Tables.Users.map(_.id)) += (id)
+    (Tables.Users.map(_.id) += (id)).map(_ => id)
   }
   private def createSignupUserAction(email: String, passwordHash: String, userName: String, userId: String) =
     Tables.SignupUsers.map(u => (u.email, u.passwordHash, u.userName, u.userId)) += (email, passwordHash, userName, userId)
