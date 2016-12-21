@@ -3,8 +3,9 @@ package net.onplatforms.lib.rdb
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import com.typesafe.config.Config
+import net.onplatforms.accounts.io.rdb.Tables
+import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
-import slick.jdbc.GetResult
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -18,21 +19,17 @@ class MySQL(
     val config: Config
     val logger: LoggingAdapter
   }
-) {
+) extends Tables {
+  override val profile: JdbcProfile = slick.driver.MySQLDriver
+
   private implicit val blocking = env.blockingContext
 
-  implicit val getCoffeeResult = GetResult(r => HeartBeat(r.<<))
-
-  private val heartBeatQuery = sql"select 1 as count".as[HeartBeat]
-
-  private val config = env.config.getConfig(s"${env.namespace}.rdb.mysql")
-
   val DB: slick.driver.MySQLDriver.backend.Database =
-    Database.forConfig("net.onplatforms.accounts.rdb.mysql")
+    Database.forConfig("net.onplatforms.lib.rdb.mysql")
 
   env.system.scheduler.schedule(1.minutes, 30.minutes) {
-    DB.run(heartBeatQuery).map(_.head).map(_.count).onComplete {
-      case Success(count) if count == 1 =>
+    DB.run(Users.countDistinct.result).onComplete {
+      case Success(count) if count >= 0 =>
         env.logger.info(s"db connection heartbeat succeed.")
       case Success(count) =>
         env.logger.info(s"db response is invalid count: $count")
@@ -44,4 +41,3 @@ class MySQL(
 
 }
 
-case class HeartBeat(count: Int)

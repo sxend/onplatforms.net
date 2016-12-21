@@ -21,7 +21,6 @@ val dependencies =  {
   val slickVersion = "3.1.1"
   val log4jVersion = "2.7"
   Seq(
-    "net.onplatforms" %% "datasource" % "0.0.1-b10-16a8ea5e997dc7e2e1bfc84ad0e4b50545e718cc",
     "com.typesafe.slick" %% "slick" % slickVersion,
     "com.typesafe.slick" %% "slick-hikaricp" % slickVersion excludeAll ExclusionRule(organization = "com.zaxxer", name = "HikariCP-java6"),
     "com.typesafe.slick" %% "slick-codegen" % slickVersion,

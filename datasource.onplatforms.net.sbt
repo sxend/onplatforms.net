@@ -1,0 +1,1 @@
+libraryDependencies += "net.onplatforms" %% "datasource" % "0.0.1-b13-a68951b133db89e203835ac620ef163018f98964"

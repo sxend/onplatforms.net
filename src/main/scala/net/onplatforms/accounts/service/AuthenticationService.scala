@@ -8,9 +8,9 @@ import akka.event.LoggingAdapter
 import akka.pattern._
 import com.typesafe.config.Config
 import net.onplatforms.accounts.entity.User
+import net.onplatforms.accounts.io.rdb.Tables
 import net.onplatforms.lib.rdb.MySQL
 import org.apache.commons.codec.digest.DigestUtils
-import slick.jdbc.JdbcBackend.Session
 
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
