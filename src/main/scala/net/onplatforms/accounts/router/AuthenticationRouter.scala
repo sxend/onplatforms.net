@@ -15,6 +15,7 @@ import akka.util.Timeout
 import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
 import net.onplatforms.accounts.service.AuthenticationService
+import net.onplatforms.accounts.service.AuthenticationService.Protocol
 import spray.json._
 
 import scala.util.{Failure, Success}
@@ -32,8 +33,10 @@ class AuthenticationRouter(
     path("signup") {
       signup
     } ~
+      path("signin") {
+        signin
+      } ~
       path("signin" / Segment) {
-        case "owned"   => ownedSignin
         case "twitter" => twitterSignin
         case _         => reject
       } ~
@@ -42,23 +45,24 @@ class AuthenticationRouter(
       }
   }
 
-  private def signup = entity(as[OwnedSignup]) { signup =>
-    val protocol = AuthenticationService.Protocol.Owned(signup.userName, signup.email, signup.password)
-    onComplete(askOwned(protocol)) {
-      case Success(user) => withSessionId { sid =>
-        setToken(sid)(complete(OwnedSignupResult(user.id)))
+  private def signup = entity(as[Signup]) { signup =>
+    val protocol = Protocol.Signup(signup.userName, signup.email, signup.password)
+    onComplete(askSignup(protocol)) {
+      case Success(user: Protocol.NewUser) => withSessionId { sid =>
+        setToken(sid)(complete(SignupResult(user.id)))
       }
-      case Failure(t) => failWith(t)
+      case Success(_: Protocol.AlreadyExists) => complete(StatusCodes.BadRequest, jsonMsg(s"${signup.email} account already exists"))
+      case Failure(t)                         => failWith(t)
     }
   }
-  private def ownedSignin = withSessionId { sid =>
+  private def signin = withSessionId { sid =>
     complete(Empty())
   }
   private def twitterSignin = complete(Empty())
   private def twitterCallback = complete(Empty())
 
-  private def askOwned(owned: AuthenticationService.Protocol.Owned) =
-    authenticationService.ask(owned).mapTo[User]
+  private def askSignup(s: AuthenticationService.Protocol.Signup) =
+    authenticationService.ask(s).mapTo[Protocol.SignupResult]
 
   private def htmlEntity(html: String) =
     HttpEntity(ContentTypes.`text/html(UTF-8)`, html)

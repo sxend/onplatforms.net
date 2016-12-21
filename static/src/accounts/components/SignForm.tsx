@@ -42,7 +42,7 @@ export class SignForm extends React.Component<SignFormProps, SignFormState> {
             <div className="control column is-half is-offset-one-quarter">
               <button className={
                 "button is-primary " + (this.submitEnabled())
-              } onClick={e => this.submit(e)} value="owned">{this.props.signupMode ? "Signup" : "Signin"}</button>
+              } onClick={e => this.submit(e)} value="">{this.props.signupMode ? "Signup" : "Signin"}</button>
             </div>
           </div>
         </div>

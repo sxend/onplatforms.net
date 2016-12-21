@@ -20,7 +20,7 @@ export class Signin extends React.Component<SigninProps, SigninState> {
     );
   }
   private onSubmit(s: SignFormState) {
-    api.signin(s.email, s.password, "owned"); // TODO: add social login
+    api.signin(s.email, s.password); // TODO: add social login
   }
   componentDidMount() {
     document.title = "Signin accounts.onplatforms.net";

@@ -1,6 +1,6 @@
 package net.onplatforms.accounts.entity
 
-case class OwnedSignup(
+case class Signup(
   userName: String,
   email:    String,
   password: String
@@ -8,4 +8,4 @@ case class OwnedSignup(
   require(password.length >= 8)
 }
 
-case class OwnedSignupResult(id: String)
+case class SignupResult(id: String)

@@ -6,8 +6,8 @@ let token: string = void 0;
 
 export const api = {
   signin: (email: string, password: string, provider?: string) => {
-    provider = provider || 'owned';
-    postJSON(v1Endpoint('/signin/' + provider), {
+    provider = provider ? '/' + provider : '';
+    postJSON(v1Endpoint('/signin' + provider), {
       email: email,
       password: password
     }).then((result: any) => {
