@@ -16,6 +16,7 @@ import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
 import net.onplatforms.accounts.service.AuthenticationService
 import net.onplatforms.accounts.service.AuthenticationService.Protocol
+import net.onplatforms.lib.kvs.Memcached
 import spray.json._
 
 import scala.util.{Failure, Success}
@@ -25,8 +26,10 @@ class AuthenticationRouter(
   env: {
     val system: ActorSystem
     val authenticationService: ActorRefFactory => ActorRef
+    val memcached: Memcached
   }
 ) extends JsonProtocol with SessionProvider {
+  override val memcached: Memcached = env.memcached
   implicit private val timeout = Timeout(2.seconds)
   private val authenticationService = env.authenticationService(env.system)
   def routes: Route = post {
@@ -48,14 +51,14 @@ class AuthenticationRouter(
   private def signup = entity(as[Signup]) { signup =>
     val protocol = Protocol.Signup(signup.userName, signup.email, signup.password)
     onComplete(askSignup(protocol)) {
-      case Success(user: Protocol.NewUser) => withSessionId { sid =>
+      case Success(user: Protocol.NewUser) => withNewSession { sid =>
         setToken(sid)(complete(SignupResult(user.id)))
       }
       case Success(_: Protocol.AlreadyExists) => complete(StatusCodes.BadRequest, jsonMsg(s"${signup.email} account already exists"))
       case Failure(t)                         => failWith(t)
     }
   }
-  private def signin = withSessionId { sid =>
+  private def signin = withNewSession { sid =>
     complete(Empty())
   }
   private def twitterSignin = complete(Empty())

@@ -12,6 +12,7 @@ class Memcached(
     val namespace: String
   }
 ) {
+  val Imports = shade.memcached.MemcachedCodecs
   private val config = env.config.getConfig(s"${env.namespace}.kvs.memcached")
   private val host = config.getString("host")
   private val port = config.getInt("port")

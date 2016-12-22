@@ -3,7 +3,7 @@ package net.onplatforms.accounts
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
-import akka.actor.{ActorRefFactory, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.event.Logging._
 import akka.http.scaladsl._
@@ -16,46 +16,53 @@ import net.onplatforms.accounts.provider.SessionProvider
 import net.onplatforms.accounts.router.AuthenticationRouter
 import net.onplatforms.accounts.service.AuthenticationService
 import net.onplatforms.lib.directive.TemplateDirective
+import net.onplatforms.lib.kvs.Memcached
 import net.onplatforms.lib.rdb.MySQL
 
 import scala.concurrent.ExecutionContext
 
-object Main extends AnyRef with SessionProvider {
+object Main {
   val config: Config = ConfigFactory.load
   val namespace = "net.onplatforms.accounts"
   def withNamespace(suffix: String) = s"$namespace.$suffix"
   def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
   val systemConfig: Config = getConfigInNamespace("system")
+  val env = new {
+    val config: Config = Main.config
+    val namespace: String = Main.namespace
+    val version: String = systemConfig.getString("version")
+    implicit val system: ActorSystem = ActorSystem("accounts-system", this.config)
+    val logger: LoggingAdapter = Logging(system.eventStream, getClass)
+    implicit val materializer = ActorMaterializer()
+    val blockingContext: ExecutionContext =
+      system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
+    val mysql: MySQL = new MySQL(this)
+    val memcached: Memcached = new Memcached(this)
+    val templateDirectiveImplicits = TemplateDirective.Implicits(this)
+    val authenticationService: (ActorRefFactory) => ActorRef = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
+    val indexRouter = new router.IndexRouter(this)
+    val signupRouter = new router.AuthenticationRouter(this)
+  }
   def main(args: Array[String]): Unit = {
-    val env = new {
-      val config: Config = Main.config
-      val namespace: String = Main.namespace
-      val version: String = systemConfig.getString("version")
-      implicit val system: ActorSystem = ActorSystem("accounts-system", this.config)
-      val logger: LoggingAdapter = Logging(system.eventStream, getClass)
-      implicit val materializer = ActorMaterializer()
-      val blockingContext: ExecutionContext =
-        system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
-      val mysql: MySQL = new MySQL(this)
-      val templateDirectiveImplicits = TemplateDirective.Implicits(this)
-      val authenticationService = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
-      val indexRouter = new router.IndexRouter(this)
-      val signupRouter = new router.AuthenticationRouter(this)
-    }
     import env._
-
-    val mapping = withDefaultSessionId { sid =>
-      pathPrefix("api" / "v1") {
-        csrfProtect {
-          signupRouter.routes
-        } ~
-          tokenEndpoint
-      } ~
-        get(indexRouter.handle)
-    } ~ reject
-
-    val route = logRequest("access", InfoLevel)(mapping)
-    Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
+    val server = new {} with Runnable with SessionProvider {
+      override val memcached: Memcached = env.memcached
+      override def run(): Unit = {
+        val mapping = newSession0 { session =>
+          logger.info(s"session: $session")
+          pathPrefix("api" / "v1") {
+            concat(
+              signupRouter.routes,
+              tokenEndpoint
+            )
+          } ~
+            get(indexRouter.handle)
+        } ~ reject
+        val route = logRequest("access", InfoLevel)(mapping)
+        Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
+      }
+    }
+    server.run()
   }
 
   object ActorNames {

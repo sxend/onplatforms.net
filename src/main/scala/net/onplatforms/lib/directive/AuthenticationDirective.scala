@@ -28,7 +28,8 @@ trait AuthenticationDirective {
         case Success(Some(userName)) => route(userId, userName)
         case Success(_)              => gotoTop
         case Failure(t) =>
-          env.logger.error(t, t.getMessage)
+          val stackTrace = t.getStackTrace.mkString(System.lineSeparator())
+          env.logger.error(t, stackTrace)
           gotoTop
       }
     }

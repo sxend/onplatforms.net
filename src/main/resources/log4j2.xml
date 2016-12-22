@@ -11,10 +11,16 @@
                 <SizeBasedTriggeringPolicy size="250 MB"/>
             </Policies>
         </RollingFile>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+        </Console>
     </Appenders>
     <Loggers>
         <Root level="info">
-            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="RollingFile" level="info"/>
+            <AppenderRef ref="Console" level="info" />
         </Root>
     </Loggers>
 </Configuration>
