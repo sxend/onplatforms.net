@@ -44,7 +44,7 @@ class AuthenticationRouter(
         case _         => reject
       } ~
       path("signout") {
-        deleteCookie("sid", ".onplatforms.net", "/")(complete(""))
+        signout
       }
   }
 
@@ -61,6 +61,8 @@ class AuthenticationRouter(
   private def signin = withNewSession { session =>
     complete(Empty())
   }
+  private def signout = deleteSession(complete(Empty()))
+
   private def twitterSignin = complete(Empty())
   private def twitterCallback = complete(Empty())
 

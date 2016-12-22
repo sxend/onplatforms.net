@@ -10,7 +10,6 @@ import akka.http.scaladsl.server.{Directive, Directive0, Directive1, Route}
 import akka.http.scaladsl.model._
 import net.onplatforms.accounts.router.JsonProtocol
 import net.onplatforms.lib.kvs.Memcached
-import spray.json._
 import akka.http.scaladsl.server.Directives._
 import net.onplatforms.accounts.entity.Session
 
@@ -20,6 +19,7 @@ import scala.concurrent.duration._
 trait SessionProvider extends AnyRef with JsonProtocol {
   val memcached: Memcached
   import memcached.Imports._
+  private val SESSION_EXPIRE = 2592000
 
   def withSession: Directive1[Session] =
     optionalCookie("sid").flatMap {
@@ -37,6 +37,8 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     setCache(sid, session).flatMap(_ => inner(())(ctx))
   }
 
+  def deleteSession: Directive0 = deleteCookie("sid", ".onplatforms.net", "/")
+
   private def getOrCreateSession(sid: String): Directive1[Session] = Directive { inner => ctx =>
     import ctx.executionContext
     val future = for {
@@ -49,8 +51,14 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     future.flatMap(t => inner(Tuple1(t))(ctx))
   }
 
+  private def deleteCache(sid: String)(implicit ec: ExecutionContext): Future[Unit] =
+    memcached.client.delete(sid).map {
+      case t if t => ()
+      case _      => throw new RuntimeException(s"failed to cache deletion. sid: $sid")
+    }
+
   private def setCache(sid: String, session: Session)(implicit ec: ExecutionContext): Future[Session] =
-    memcached.client.set(sid, session, 2.seconds).map(_ => session)
+    memcached.client.set(sid, session, SESSION_EXPIRE.seconds).map(_ => session)
 
   private def getCache(sid: String): Future[Option[Session]] =
     memcached.client.get[Session](sid)
@@ -61,12 +69,11 @@ trait SessionProvider extends AnyRef with JsonProtocol {
 
   private def cookieHeader(sid: String) =
     HttpCookie("sid", sid,
-      maxAge = Option(2592000), domain = Option(".onplatforms.net"), path = Option("/"))
+      maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.net"), path = Option("/"))
 
   private def newSessionId = UUID.randomUUID().toString
 
 }
 
 object SessionProvider {
-  val _cache = new ConcurrentHashMap[String, String]()
 }
