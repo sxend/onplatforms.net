@@ -48,12 +48,14 @@ object Main {
     val server = new {} with Runnable with SessionProvider {
       override val memcached: Memcached = env.memcached
       override def run(): Unit = {
-        val mapping = withSession { session =>
-          logger.info(s"session: $session")
+        val mapping = {
           pathPrefix("api" / "v1") {
-            signupRouter.routes
+            protectCSRF {
+              signupRouter.routes
+            } ~
+              setCSRFToken(path("token")(complete(Empty())))
           } ~
-            get(indexRouter.handle)
+            setCSRFToken(get(indexRouter.handle))
         } ~ reject
         val route = logRequest("access", InfoLevel)(mapping)
         Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))

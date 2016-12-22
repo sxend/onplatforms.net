@@ -52,15 +52,17 @@ class AuthenticationRouter(
     val protocol = Protocol.Signup(signup.userName, signup.email, signup.password)
     onComplete(askSignup(protocol)) {
       case Success(user: Protocol.NewUser) => withNewSession { session =>
-        complete(SignupResult(user.id))
+        reCoverCSRFToken(session)(complete(SignupResult(user.id)))
       }
       case Success(_: Protocol.AlreadyExists) => complete(StatusCodes.BadRequest, jsonMsg(s"${signup.email} account already exists"))
       case Failure(t)                         => failWith(t)
     }
   }
+
   private def signin = withNewSession { session =>
-    complete(Empty())
+    reCoverCSRFToken(session)(complete(Empty()))
   }
+
   private def signout = deleteSession(complete(Empty()))
 
   private def twitterSignin = complete(Empty())

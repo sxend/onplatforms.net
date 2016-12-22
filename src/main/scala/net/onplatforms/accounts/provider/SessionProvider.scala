@@ -37,7 +37,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     setCache(sid, session).flatMap(_ => inner(())(ctx))
   }
 
-  def deleteSession: Directive0 = deleteCookie("sid", ".onplatforms.net", "/")
+  def deleteSession: Directive0 = deleteCookie("sid", ".onplatforms.local", "/")
 
   private def getOrCreateSession(sid: String): Directive1[Session] = Directive { inner => ctx =>
     import ctx.executionContext
@@ -58,6 +58,10 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     memcached.client.get[Session](sid)
 
   def setCSRFToken: Directive0 = withSession.flatMap { session =>
+    reCoverCSRFToken(session)
+  }
+
+  def reCoverCSRFToken(session: Session): Directive0 = {
     val token = UUID.randomUUID().toString
     setSession(session.sid, session.copy(csrfToken = Option(token))).tflatMap { _ =>
       respondWithDefaultHeader(RawHeader("X-CSRF-Token", token))
@@ -67,7 +71,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
   def protectCSRF: Directive0 =
     headerValueByName("X-CSRF-Token").flatMap { sendToken =>
       withSession.flatMap {
-        case Session(sid, Some(token)) if sendToken == token =>
+        case Session(_, Some(token)) if sendToken == token =>
           Directive.Empty
         case _ => reject
       }
@@ -75,7 +79,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
 
   private def cookieHeader(sid: String) =
     HttpCookie("sid", sid,
-      maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.net"), path = Option("/"))
+      maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.local"), path = Option("/"))
 
   private def newSessionId = UUID.randomUUID().toString
 
