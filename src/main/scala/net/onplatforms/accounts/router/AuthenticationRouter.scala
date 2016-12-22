@@ -51,14 +51,14 @@ class AuthenticationRouter(
   private def signup = entity(as[Signup]) { signup =>
     val protocol = Protocol.Signup(signup.userName, signup.email, signup.password)
     onComplete(askSignup(protocol)) {
-      case Success(user: Protocol.NewUser) => withNewSession { sid =>
-        setToken(sid)(complete(SignupResult(user.id)))
+      case Success(user: Protocol.NewUser) => withNewSession { session =>
+        complete(SignupResult(user.id))
       }
       case Success(_: Protocol.AlreadyExists) => complete(StatusCodes.BadRequest, jsonMsg(s"${signup.email} account already exists"))
       case Failure(t)                         => failWith(t)
     }
   }
-  private def signin = withNewSession { sid =>
+  private def signin = withNewSession { session =>
     complete(Empty())
   }
   private def twitterSignin = complete(Empty())

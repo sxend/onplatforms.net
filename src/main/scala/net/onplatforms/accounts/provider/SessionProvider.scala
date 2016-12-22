@@ -12,78 +12,59 @@ import net.onplatforms.accounts.router.JsonProtocol
 import net.onplatforms.lib.kvs.Memcached
 import spray.json._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.util.Tupler
-import akka.http.scaladsl.util.FastFuture._
 import net.onplatforms.accounts.entity.Session
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 trait SessionProvider extends AnyRef with JsonProtocol {
   val memcached: Memcached
   import memcached.Imports._
 
-  def newSession0: Directive1[Session] =
+  def withSession: Directive1[Session] =
     optionalCookie("sid").flatMap {
-      case Some(pair) => getOrCreateSession(pair.value)
-      case _ => getOrCreateSession(UUID.randomUUID().toString).flatMap { session =>
-        val cookie = HttpCookie("sid", session.sid,
-          maxAge = Option(2592000), domain = Option(".onplatforms.net"), path = Option("/"))
-        setCookie(cookie).tmap(_ => session)
-      }
+      case Some(pair) if pair.value.nonEmpty => getOrCreateSession(pair.value)
+      case _                                 => withNewSession
     }
+
+  def withNewSession: Directive1[Session] =
+    getOrCreateSession(newSessionId).flatMap { session =>
+      setCookie(cookieHeader(session.sid)).tmap(_ => session)
+    }
+
+  def setSession(sid: String, session: Session): Directive0 = Directive { inner => ctx =>
+    import ctx.executionContext
+    setCache(sid, session).flatMap(_ => inner(())(ctx))
+  }
 
   private def getOrCreateSession(sid: String): Directive1[Session] = Directive { inner => ctx =>
     import ctx.executionContext
     val future = for {
-      cacheDataOpt <- memcached.client.get[Session](sid)
-      session <- cacheDataOpt match {
-        case Some(cacheData) => Future.successful(cacheData)
-        case _ =>
-          val newSession = Session(sid)
-          memcached.client.set(sid, newSession, 2.seconds).map(_ => newSession)
+      cachedSessionOpt <- getCache(sid)
+      session <- cachedSessionOpt match {
+        case Some(cachedSession) => Future.successful(cachedSession)
+        case _                   => setCache(sid, Session(sid))
       }
     } yield session
     future.flatMap(t => inner(Tuple1(t))(ctx))
   }
 
-  def withSession(route: String => Route): Route = optionalCookie("sid") {
-    case None       => withNewSession(sid => route(sid))
-    case Some(pair) => route(pair.value)
-  }
-  def withNewSession(route: String => Route): Route = {
-    val sid = UUID.randomUUID.toString
-    setCookie(HttpCookie("sid", sid, // TODO: uuid persist
-      maxAge = Option(2592000), domain = Option(".accounts.onplatforms.net"), path = Option("/"))) {
-      setToken(sid)(route(sid))
-    }
-  }
+  private def setCache(sid: String, session: Session)(implicit ec: ExecutionContext): Future[Session] =
+    memcached.client.set(sid, session, 2.seconds).map(_ => session)
 
-  def csrfProtect(route: Route): Route = checkToken(registerToken(route))
+  private def getCache(sid: String): Future[Option[Session]] =
+    memcached.client.get[Session](sid)
 
-  def registerToken(route: Route): Route = withSession { sid =>
-    setToken(sid)(route)
-  }
-  def setToken(sid: String)(route: Route): Route = {
-    val token = UUID.randomUUID().toString
-    val tokenHeader = RawHeader("X-CSRF-Token", token)
-    SessionProvider._cache.put(sid, token)
-    respondWithHeader(tokenHeader)(route)
-  }
-  def checkToken(route: Route): Route = withSession { sid =>
-    headerValueByName("X-CSRF-Token") { token =>
-      Option(SessionProvider._cache.get(sid)) match {
-        case Some(sendToken) if sendToken == token =>
-          SessionProvider._cache.remove(sid)
-          route
-        case _ =>
-          complete(StatusCodes.BadRequest, "Invalid X-CSRF-Token")
-      }
-    }
-  }
   def tokenEndpoint: Route = post(path("token") {
-    registerToken(complete(Empty()))
+    complete(Empty())
   })
+
+  private def cookieHeader(sid: String) =
+    HttpCookie("sid", sid,
+      maxAge = Option(2592000), domain = Option(".onplatforms.net"), path = Option("/"))
+
+  private def newSessionId = UUID.randomUUID().toString
+
 }
 
 object SessionProvider {

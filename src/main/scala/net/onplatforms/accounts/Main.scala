@@ -48,7 +48,7 @@ object Main {
     val server = new {} with Runnable with SessionProvider {
       override val memcached: Memcached = env.memcached
       override def run(): Unit = {
-        val mapping = newSession0 { session =>
+        val mapping = withSession { session =>
           logger.info(s"session: $session")
           pathPrefix("api" / "v1") {
             concat(
