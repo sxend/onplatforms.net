@@ -51,21 +51,27 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     future.flatMap(t => inner(Tuple1(t))(ctx))
   }
 
-  private def deleteCache(sid: String)(implicit ec: ExecutionContext): Future[Unit] =
-    memcached.client.delete(sid).map {
-      case t if t => ()
-      case _      => throw new RuntimeException(s"failed to cache deletion. sid: $sid")
-    }
-
   private def setCache(sid: String, session: Session)(implicit ec: ExecutionContext): Future[Session] =
     memcached.client.set(sid, session, SESSION_EXPIRE.seconds).map(_ => session)
 
   private def getCache(sid: String): Future[Option[Session]] =
     memcached.client.get[Session](sid)
 
-  def tokenEndpoint: Route = post(path("token") {
-    complete(Empty())
-  })
+  def setCSRFToken: Directive0 = withSession.flatMap { session =>
+    val token = UUID.randomUUID().toString
+    setSession(session.sid, session.copy(csrfToken = Option(token))).tflatMap { _ =>
+      respondWithDefaultHeader(RawHeader("X-CSRF-Token", token))
+    }
+  }
+
+  def protectCSRF: Directive0 =
+    headerValueByName("X-CSRF-Token").flatMap { sendToken =>
+      withSession.flatMap {
+        case Session(sid, Some(token)) if sendToken == token =>
+          Directive.Empty
+        case _ => reject
+      }
+    }
 
   private def cookieHeader(sid: String) =
     HttpCookie("sid", sid,

@@ -51,10 +51,7 @@ object Main {
         val mapping = withSession { session =>
           logger.info(s"session: $session")
           pathPrefix("api" / "v1") {
-            concat(
-              signupRouter.routes,
-              tokenEndpoint
-            )
+            signupRouter.routes
           } ~
             get(indexRouter.handle)
         } ~ reject
