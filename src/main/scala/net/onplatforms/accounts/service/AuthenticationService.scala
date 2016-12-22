@@ -7,7 +7,7 @@ import akka.actor.Actor
 import akka.event.LoggingAdapter
 import akka.pattern._
 import com.typesafe.config.Config
-import net.onplatforms.accounts.io.rdb.Tables
+import net.onplatforms.accounts.datasource.Tables
 import net.onplatforms.lib.rdb.MySQL
 import slick.driver.MySQLDriver.api._
 import org.apache.commons.codec.digest.DigestUtils
@@ -26,7 +26,7 @@ class AuthenticationService(
 ) extends Actor {
   import context.dispatcher
   private val SALT: String = env.config.getString(s"${env.namespace}.authentication.signup.password-hash-salt")
-  private val db = env.mysql.DB
+  private val db = env.mysql.db
 
   def receive = {
     case Signup(userName, email, password) =>

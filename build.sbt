@@ -15,7 +15,7 @@ resolvers ++= Seq(
   "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 )
 
-val dependencies =  {
+libraryDependencies ++= {
   val akkaHttpVersion = "10.0.0"
   val spec2Version = "3.8.4"
   val slickVersion = "3.1.1"
@@ -48,37 +48,6 @@ val dependencies =  {
     "org.scalariform" %% "scalariform" % "0.1.8" % "compile"
   )
 }
-
-val RDB_USER = Option(System.getenv("RDB_USER"))
-  .orElse(Option(System.getProperty("sbt.RDB_USER"))).getOrElse("0.0.0.0")
-
-val RDB_PASS = Option(System.getenv("RDB_PASS"))
-  .orElse(Option(System.getProperty("sbt.RDB_PASS"))).getOrElse("3306")
-
-def slickCodeGenTask(cp: Seq[Attributed[File]], r: ScalaRun) = {
-  val slickDriver = "slick.driver.MySQLDriver"
-  val jdbcDriver = "com.mysql.cj.jdbc.Driver"
-  val url = "jdbc:mysql://localhost:3306/accounts.onplatforms.net?useSSL=false&nullNamePatternMatchesAll=true"
-  val outputDir = new File("src/main/scala").absolutePath
-  val pkg = "net.onplatforms.accounts.io.rdb"
-  val args = Array(slickDriver, jdbcDriver, url, outputDir, pkg, RDB_USER, RDB_PASS)
-  r.run("slick.codegen.SourceCodeGenerator", cp.files, args, Logger.Null)
-  Seq(file(outputDir + "/Tables.scala"))
-}
-
-lazy val mainProject = Project(
-  id="app",
-  base=file("."),
-  settings = Defaults.coreDefaultSettings ++ Seq(
-    scalaVersion := "2.11.8",
-    libraryDependencies ++= dependencies,
-    slick := {
-      slickCodeGenTask((dependencyClasspath in Compile).value, (runner in Compile).value)
-    } // register manual sbt command
-  )
-)
-
-lazy val slick = TaskKey[Seq[File]]("slick-gen")
 
 publishMavenStyle := false
 
