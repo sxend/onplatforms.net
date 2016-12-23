@@ -14,6 +14,9 @@ export class Signup extends React.Component<SignupProps, SignupState> {
     super(props);
     this.state = {} as SignupState;
   }
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  };
   render() {
     return (
       <SignForm signupMode={true} onSubmit={s => this.onSubmit(s)}/>

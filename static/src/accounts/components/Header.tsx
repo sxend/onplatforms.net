@@ -23,7 +23,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   toggleOff() {
     this.setState({
       isMenuToggleOn: false
-    } as HeaderState)
+    } as HeaderState);
   }
   render() {
     return (
@@ -66,7 +66,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   private signout(e: any) {
     api.signout().then(response => {
       if (response.status === 200) {
-        this.context.router.push(response.body.location);
+        location.href = "/";
       }
     });
   }

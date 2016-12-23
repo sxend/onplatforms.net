@@ -2,7 +2,8 @@ import 'whatwg-fetch';
 import 'promise';
 
 const API_URL = "/* @echo API_URL */";
-let token: string = void 0;
+let tokenHeader = document.querySelector('[http-equiv="X-CSRF-Token"]') as HTMLMetaElement;
+let token: string = tokenHeader ? tokenHeader.content : void 0;
 
 export const api = {
   signin: (email: string, password: string, provider?: string) => {

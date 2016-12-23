@@ -59,8 +59,7 @@ object Main {
                 withNewCSRFToken {
                   homeRouter.routes
                 }
-            } ~
-              withNewCSRFToken(post(path("token")(complete(Empty())))) // token genarete endpoint
+            }
           } ~
             path("favicon.ico")(getFromResource("favicon.ico")) ~
             get(indexRouter.handle) // index page
