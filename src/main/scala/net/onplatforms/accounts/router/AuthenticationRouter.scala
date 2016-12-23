@@ -25,13 +25,13 @@ import scala.concurrent.duration._
 class AuthenticationRouter(
   env: {
     val system: ActorSystem
-    val authenticationService: ActorRefFactory => ActorRef
+    val authenticationService: () => ActorRef
     val cacheService: CacheService
   }
 ) extends JsonProtocol with SessionProvider {
   override val cacheService: CacheService = env.cacheService
   implicit private val timeout = Timeout(2.seconds)
-  private val authenticationService = env.authenticationService(env.system)
+  private val authenticationService: ActorRef = env.authenticationService()
   def routes: Route = post {
     path("signup") {
       signup

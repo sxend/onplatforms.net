@@ -8,6 +8,7 @@ import akka.event.LoggingAdapter
 import akka.pattern._
 import com.typesafe.config.Config
 import net.onplatforms.accounts.datasource.Tables
+import net.onplatforms.accounts.db.Actions._
 import net.onplatforms.lib.rdb.MySQL
 import slick.driver.MySQLDriver.api._
 import org.apache.commons.codec.digest.DigestUtils
@@ -36,7 +37,7 @@ class AuthenticationService(
   }
   private def signup(userName: String, email: String, password: String): Future[SignupResult] = {
     val action = for {
-      signupUserOpt <- findOneSignupedUserAction(email)
+      signupUserOpt <- findOneSignupUser(email)
       result <- signupUserOpt match {
         case Some(signupUser) => findUser(signupUser.userId)
         case _                => createUsers(email, password, userName)
@@ -47,7 +48,7 @@ class AuthenticationService(
   }
 
   private def signin(email: String, password: String): Future[SigninResult] = {
-    val action = findOneSignupedUserAction(email).map {
+    val action = findOneSignupUser(email).map {
       case Some(signupUser) if signupUser.passwordHash == passwordHashing(email, password) =>
         Success(signupUser.userId)
       case _ => Fail()
@@ -57,25 +58,19 @@ class AuthenticationService(
 
   private def createUsers[A](email: String, password: String, userName: String) = {
     for {
-      userId <- createNewUserAction
-      _ <- createSignupUserAction(email, passwordHashing(email, password), userName, userId)
+      userId <- createNewUser
+      _ <- createSignupUser(email, passwordHashing(email, password), userName, userId)
+      _ <- createSignupProviderRelation(userId)
     } yield NewUser(userId, email, userName)
   }
   private def findUser(id: String) =
-    findOneUserAction(id).map {
+    findOneUser(id).map {
       case Some(user) => AlreadyExists()
       case _          => throw new RuntimeException(s"user not found.")
     }
-  private def findOneSignupedUserAction(email: String) =
-    Tables.SignupUsers.filter(_.email === email).result.map(_.headOption)
-  private def findOneUserAction(id: String) =
-    Tables.Users.filter(_.id === id).result.map(_.headOption)
-  private def createNewUserAction = {
-    val id = UUID.randomUUID().toString
-    (Tables.Users.map(_.id) += id).map(_ => id)
+  private def createSignupProviderRelation(userId: String) = {
+    provideUser(userId).map(_ => ())
   }
-  private def createSignupUserAction(email: String, passwordHash: String, userName: String, userId: String) =
-    Tables.SignupUsers.map(u => (u.email, u.passwordHash, u.userName, u.userId)) += (email, passwordHash, userName, userId)
 
   @tailrec
   private def passwordHashing(email: String, password: String, count: Int = 0): String = {

@@ -3,6 +3,8 @@ package net.onplatforms.accounts.router
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import com.typesafe.config.Config
+import net.onplatforms.accounts.Main
 import net.onplatforms.lib.directive.Directives._
 import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.lib.directive.TemplateDirective.Implicits
@@ -17,10 +19,13 @@ class IndexRouter(
 ) {
 
   implicit val templateImplicits: Implicits = env.templateDirectiveImplicits
-
-  def handle: Route = template("accounts/templates/index.html", Map("version" -> env.version)) {
-    case Success(html) => complete(htmlEntity(html))
-    case _             => reject
+  private val config = Main.getConfigInNamespace("script")
+  def handle: Route = {
+    val attr = Map("version" -> env.version, "bootstrap" -> config.getString("bootstrap"))
+    template("accounts/templates/index.html", attr) {
+      case Success(html) => complete(htmlEntity(html))
+      case _             => reject
+    }
   }
 
   private def htmlEntity(html: String) =

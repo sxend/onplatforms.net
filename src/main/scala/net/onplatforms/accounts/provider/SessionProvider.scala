@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
 import net.onplatforms.accounts.router.JsonProtocol
 import akka.http.scaladsl.server.Directives._
+import com.typesafe.config.ConfigFactory
 import net.onplatforms.accounts.entity.Session
 import net.onplatforms.accounts.service.CacheService
 
@@ -17,6 +18,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
   protected val cacheService: CacheService
 
   private val SESSION_EXPIRE = 2592000
+  private val sessionConfig = ConfigFactory.load.getConfig("net.onplatforms.accounts.session")
 
   def withSession: Directive1[Session] =
     optionalCookie("sid").flatMap {
@@ -34,7 +36,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     setCache(sid, session).flatMap(_ => inner(())(ctx))
   }
 
-  def deleteSession: Directive0 = deleteCookie("sid", ".onplatforms.net", "/")
+  def deleteSession: Directive0 = deleteCookie("sid", sessionConfig.getString("domain"), "/")
 
   private def getOrCreateSession(sid: String): Directive1[Session] = Directive { inner => ctx =>
     import ctx.executionContext
@@ -76,7 +78,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
 
   private def cookieHeader(sid: String) =
     HttpCookie("sid", sid,
-      maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.net"), path = Option("/"))
+      maxAge = Option(SESSION_EXPIRE), domain = Option(sessionConfig.getString("domain")), path = Option("/"))
 
   private def newSessionId = UUID.randomUUID().toString
   private def generateCSRFToken = UUID.randomUUID().toString

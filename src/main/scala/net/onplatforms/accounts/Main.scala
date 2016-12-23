@@ -1,9 +1,9 @@
 package net.onplatforms.accounts
 
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props, TypedActor, TypedProps}
 import akka.event.{Logging, LoggingAdapter}
 import akka.event.Logging._
 import akka.http.scaladsl._
@@ -13,12 +13,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 import net.onplatforms.accounts.provider.SessionProvider
-import net.onplatforms.accounts.service.{AuthenticationService, CacheService}
+import net.onplatforms.accounts.service.{AuthenticationService, CacheService, UserService}
 import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.lib.kvs.Memcached
 import net.onplatforms.lib.rdb.MySQL
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 object Main {
   val config: Config = ConfigFactory.load
@@ -38,7 +38,10 @@ object Main {
     val mysql: MySQL = new MySQL(this)
     val memcached: Memcached = new Memcached(this)
     val templateDirectiveImplicits = TemplateDirective.Implicits(this)
-    val authenticationService: (ActorRefFactory) => ActorRef = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
+    lazy val authenticationService: () => ActorRef =
+      singleton(system.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name))
+    lazy val userService: () => ActorRef =
+      singleton(system.actorOf(Props(classOf[UserService], this), ActorNames.UserService.name))
     val cacheService: CacheService = new CacheService(this)
     val indexRouter = new router.IndexRouter(this)
     val signupRouter = new router.AuthenticationRouter(this)
@@ -73,12 +76,24 @@ object Main {
     env.logger.log(level, s"access: ${ctx.request.copy(entity = HttpEntity("#concealing#"))}")
     inner(())(ctx)
   }
-
+  private def singleton[A](creator: => A): () => A = {
+    var actor: Option[A] = None // non thread-safe!!!
+    () => {
+      if (actor.isEmpty) {
+        actor = Option(creator)
+      }
+      actor.get
+    }
+  }
   object ActorNames {
-    case class Generator(basename: String) {
+    class Generator(basename: String) {
       private val seqNr = new AtomicInteger(0)
       def name: String = s"${basename}_${seqNr.incrementAndGet()}"
     }
-    val AuthenticationService = Generator("authentication_service")
+    class SingletonGenerator(basename: String) extends Generator(basename) {
+      override def name: String = basename
+    }
+    val AuthenticationService: Generator = new SingletonGenerator("authentication_service")
+    val UserService: Generator = new SingletonGenerator("user_service")
   }
 }

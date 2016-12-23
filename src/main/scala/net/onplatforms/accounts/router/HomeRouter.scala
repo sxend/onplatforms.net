@@ -15,11 +15,15 @@ import spray.json._
 
 class HomeRouter(
   env: {
+    val system: ActorSystem
     val cacheService: CacheService
+    val userService: () => ActorRef
     val logger: LoggingAdapter
   }
 ) extends JsonProtocol with SessionProvider {
   override val cacheService: CacheService = env.cacheService
+  private val userService: ActorRef = env.userService()
+
   def routes = home
   private def home = get(path("home") {
     withSession {
