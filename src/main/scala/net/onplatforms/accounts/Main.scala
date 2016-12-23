@@ -7,14 +7,11 @@ import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.event.Logging._
 import akka.http.scaladsl._
-import akka.http.scaladsl.model.headers.{HttpCookie, RawHeader}
-import akka.http.scaladsl.server.Directives.{pathPrefix, _}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 import net.onplatforms.accounts.provider.SessionProvider
-import net.onplatforms.accounts.router.AuthenticationRouter
-import net.onplatforms.accounts.service.AuthenticationService
+import net.onplatforms.accounts.service.{AuthenticationService, CacheService}
 import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.lib.kvs.Memcached
 import net.onplatforms.lib.rdb.MySQL
@@ -40,6 +37,7 @@ object Main {
     val memcached: Memcached = new Memcached(this)
     val templateDirectiveImplicits = TemplateDirective.Implicits(this)
     val authenticationService: (ActorRefFactory) => ActorRef = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
+    val cacheService: CacheService = new CacheService(this)
     val indexRouter = new router.IndexRouter(this)
     val signupRouter = new router.AuthenticationRouter(this)
     val homeRouter = new router.HomeRouter(this)
@@ -47,17 +45,20 @@ object Main {
   def main(args: Array[String]): Unit = {
     import env._
     val server = new {} with Runnable with SessionProvider {
-      override val memcached: Memcached = env.memcached
+      override val cacheService: CacheService = env.cacheService
       override def run(): Unit = {
         val mapping = {
           pathPrefix("api" / "v1") {
             checkCSRFToken {
-              signupRouter.routes ~
-              homeRouter.routes
+              signupRouter.routes ~ // self token setting
+                setCSRFToken {
+                  homeRouter.routes
+                }
             } ~
-              setCSRFToken(path("token")(complete(Empty())))
+              setCSRFToken(post(path("token")(complete(Empty())))) // token genarete endpoint
           } ~
-            setCSRFToken(get(indexRouter.handle))
+            path("favicon.ico")(getFromResource("favicon.ico")) ~
+            get(indexRouter.handle) // index page
         } ~ reject
         val route = logRequest("access", InfoLevel)(mapping)
         Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))

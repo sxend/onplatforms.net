@@ -1,25 +1,22 @@
 package net.onplatforms.accounts.provider
 
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.{HttpCookie, HttpCookiePair, RawHeader}
+import akka.http.scaladsl.model.headers.{HttpCookie, RawHeader}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{Directive, Directive0, Directive1, Route}
-import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
 import net.onplatforms.accounts.router.JsonProtocol
 import net.onplatforms.lib.kvs.Memcached
 import akka.http.scaladsl.server.Directives._
 import net.onplatforms.accounts.entity.Session
+import net.onplatforms.accounts.service.CacheService
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 
 trait SessionProvider extends AnyRef with JsonProtocol {
-  val memcached: Memcached
-  import memcached.Imports._
+  protected val cacheService: CacheService
+
   private val SESSION_EXPIRE = 2592000
 
   def withSession: Directive1[Session] =
@@ -46,24 +43,24 @@ trait SessionProvider extends AnyRef with JsonProtocol {
       cachedSessionOpt <- getCache(sid)
       session <- cachedSessionOpt match {
         case Some(cachedSession) => Future.successful(cachedSession)
-        case _                   => setCache(sid, Session(sid))
+        case _                   => setCache(sid, Session(sid, None, Option(generateCSRFToken)))
       }
     } yield session
     future.flatMap(t => inner(Tuple1(t))(ctx))
   }
 
   private def setCache(sid: String, session: Session)(implicit ec: ExecutionContext): Future[Session] =
-    memcached.client.set(sid, session, SESSION_EXPIRE.seconds).map(_ => session)
+    cacheService.setSession(sid, session, SESSION_EXPIRE)
 
   private def getCache(sid: String): Future[Option[Session]] =
-    memcached.client.get[Session](sid)
+    cacheService.getSession(sid)
 
   def setCSRFToken: Directive0 = withSession.flatMap { session =>
     reCoverCSRFToken(session)
   }
 
   def reCoverCSRFToken(session: Session): Directive0 = {
-    val token = UUID.randomUUID().toString
+    val token = generateCSRFToken
     setSession(session.sid, session.copy(csrfToken = Option(token))).tflatMap { _ =>
       respondWithDefaultHeader(RawHeader("X-CSRF-Token", token))
     }
@@ -83,6 +80,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
       maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.net"), path = Option("/"))
 
   private def newSessionId = UUID.randomUUID().toString
+  private def generateCSRFToken = UUID.randomUUID().toString
 
 }
 

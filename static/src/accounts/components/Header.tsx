@@ -13,6 +13,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     this.state = {isMenuToggleOn: false};
     this.onMenuClick = this.onMenuClick.bind(this);
   }
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  };
   onMenuClick() {
     this.setState((prev) => ({
       isMenuToggleOn: !prev.isMenuToggleOn

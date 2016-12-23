@@ -14,7 +14,7 @@ import akka.http.scaladsl.model.headers.HttpCookie
 import akka.util.Timeout
 import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
-import net.onplatforms.accounts.service.AuthenticationService
+import net.onplatforms.accounts.service.{AuthenticationService, CacheService}
 import net.onplatforms.accounts.service.AuthenticationService.Protocol
 import net.onplatforms.lib.kvs.Memcached
 import spray.json._
@@ -26,10 +26,10 @@ class AuthenticationRouter(
   env: {
     val system: ActorSystem
     val authenticationService: ActorRefFactory => ActorRef
-    val memcached: Memcached
+    val cacheService: CacheService
   }
 ) extends JsonProtocol with SessionProvider {
-  override val memcached: Memcached = env.memcached
+  override val cacheService: CacheService = env.cacheService
   implicit private val timeout = Timeout(2.seconds)
   private val authenticationService = env.authenticationService(env.system)
   def routes: Route = post {
@@ -70,7 +70,9 @@ class AuthenticationRouter(
     }
   }
 
-  private def signout = deleteSession(complete(SignoutResponse(location = "/")))
+  private def signout = entity(as[Signout]) { signout =>
+    deleteSession(complete(SignoutResponse(location = "/")))
+  }
 
   private def twitterSignin = complete(Empty())
   private def twitterCallback = complete(Empty())
