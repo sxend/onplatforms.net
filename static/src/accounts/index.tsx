@@ -11,17 +11,21 @@ import * as utils from '../lib/utils';
 import {Main} from "./components/Main";
 import {Signin} from "./components/Signin";
 import {Signup} from "./components/Signup";
+import {Home} from "./components/Home";
 
 utils.setViewport('width=device-width,initial-scale=1.0');
 const PREFIX= "";
 
-ReactDOM.render((
+const router = (
   <Router history={browserHistory}>
     <Route path={PREFIX + "/"} component={Signup} />
     <Route path={PREFIX + "/signin"} component={Signin} />
     <Route path={PREFIX + "/signup"} component={Signup} />
+    <Route path={PREFIX + "/home"} component={Home} />
   </Router>
-), document.getElementById("main-contents"));
+);
+
+ReactDOM.render(router, document.getElementById("main-contents"));
 
 export const platform = {
   Main,

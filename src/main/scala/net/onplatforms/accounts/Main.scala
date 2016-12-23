@@ -42,6 +42,7 @@ object Main {
     val authenticationService: (ActorRefFactory) => ActorRef = (context: ActorRefFactory) => context.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name)
     val indexRouter = new router.IndexRouter(this)
     val signupRouter = new router.AuthenticationRouter(this)
+    val homeRouter = new router.HomeRouter(this)
   }
   def main(args: Array[String]): Unit = {
     import env._
@@ -50,8 +51,9 @@ object Main {
       override def run(): Unit = {
         val mapping = {
           pathPrefix("api" / "v1") {
-            protectCSRF {
-              signupRouter.routes
+            checkCSRFToken {
+              signupRouter.routes ~
+              homeRouter.routes
             } ~
               setCSRFToken(path("token")(complete(Empty())))
           } ~

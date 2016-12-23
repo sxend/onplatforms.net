@@ -15,6 +15,7 @@ import net.onplatforms.accounts.entity.Session
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 trait SessionProvider extends AnyRef with JsonProtocol {
   val memcached: Memcached
@@ -37,7 +38,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     setCache(sid, session).flatMap(_ => inner(())(ctx))
   }
 
-  def deleteSession: Directive0 = deleteCookie("sid", ".onplatforms.local", "/")
+  def deleteSession: Directive0 = deleteCookie("sid", ".onplatforms.net", "/")
 
   private def getOrCreateSession(sid: String): Directive1[Session] = Directive { inner => ctx =>
     import ctx.executionContext
@@ -68,10 +69,10 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     }
   }
 
-  def protectCSRF: Directive0 =
+  def checkCSRFToken: Directive0 =
     headerValueByName("X-CSRF-Token").flatMap { sendToken =>
       withSession.flatMap {
-        case Session(_, Some(token)) if sendToken == token =>
+        case Session(_, _, Some(token)) if sendToken == token =>
           Directive.Empty
         case _ => reject
       }
@@ -79,7 +80,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
 
   private def cookieHeader(sid: String) =
     HttpCookie("sid", sid,
-      maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.local"), path = Option("/"))
+      maxAge = Option(SESSION_EXPIRE), domain = Option(".onplatforms.net"), path = Option("/"))
 
   private def newSessionId = UUID.randomUUID().toString
 

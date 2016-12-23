@@ -57,7 +57,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     );
   }
   private signout(e: any) {
-    api.signout();
+    api.signout().then(response => {
+      if (response.status === 200) {
+        this.context.router.push(response.body.location);
+      }
+    });
   }
   componentDidMount() {
   }

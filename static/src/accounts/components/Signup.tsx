@@ -20,9 +20,13 @@ export class Signup extends React.Component<SignupProps, SignupState> {
     );
   }
   private onSubmit(s: SignFormState) {
-    api.signup(s.userName, s.email, s.password);
+    api.signup(s.userName, s.email, s.password).then(response => {
+      if (response.status == 200) {
+        this.context.router.push(response.body.location);
+      }
+    });
   }
   componentDidMount() {
-    document.title = "Signup accounts.onplatforms.net";
+    document.title = "Signup - accounts.onplatforms.net";
   }
 }

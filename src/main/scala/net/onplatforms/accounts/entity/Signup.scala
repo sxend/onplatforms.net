@@ -8,4 +8,4 @@ case class Signup(
   require(password.length >= 8)
 }
 
-case class SignupResult(id: String)
+case class SignupResponse(location: String)

@@ -7,26 +7,29 @@ let token: string = void 0;
 export const api = {
   signin: (email: string, password: string, provider?: string) => {
     provider = provider ? '/' + provider : '';
-    postJSON(v1Endpoint('/signin' + provider), {
+    return requestJSON(v1Endpoint('/signin' + provider), {
       email: email,
       password: password
-    }).then((result: any) => {
     });
   },
   signup: (userName: string, email: string, password: string) => {
-    postJSON(v1Endpoint('/signup'), {
+    return requestJSON(v1Endpoint('/signup'), {
       userName: userName,
       email: email,
       password: password
-    }).then((result: any) => {
     });
   },
   signout: () => {
-    postJSON(v1Endpoint('/signout'), {
-    }).then((result: any) => {
+    return requestJSON(v1Endpoint('/signout'), {
+    }, {
+      redirect: 'manual'
+    });
+  },
+  home: () => {
+    return requestJSON(v1Endpoint('/home'), null, {
+      method: 'GET'
     });
   }
-
 };
 
 function v1Endpoint(path: string) {
@@ -44,20 +47,26 @@ function fetchToken() {
   }).then(updateToken, updateToken);
 }
 
-function postJSON(path: string, param: any) {
+function requestJSON(path: string, param: any, option: any = {}) {
   function execute() {
-    return fetch(API_URL + path, {
+    let _option: any = Object.assign({
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-CSRF-Token': token
       },
-      body: JSON.stringify(param),
       credentials: 'include'
-    }).then(updateToken, updateToken)
+    }, param? {body: JSON.stringify(param)} : {}, option);
+    return fetch(API_URL + path, _option).then(updateToken, updateToken)
       .then((response: Response) => {
-        return response.json();
+        return response.json().then(body => {
+          return {
+            status: response.status,
+            headers: response.headers,
+            body: body
+          }
+        });
       });
   }
   if (!token) {

@@ -31,6 +31,8 @@ class AuthenticationService(
   def receive = {
     case Signup(userName, email, password) =>
       signup(userName, email, password).pipeTo(sender())
+    case Signin(email, password) =>
+      signin(email, password).pipeTo(sender())
   }
   private def signup(userName: String, email: String, password: String): Future[SignupResult] = {
     val action = for {
@@ -43,6 +45,16 @@ class AuthenticationService(
 
     db.run(action.transactionally)
   }
+
+  private def signin(email: String, password: String): Future[SigninResult] = {
+    val action = findOneSignupedUserAction(email).map {
+      case Some(signupUser) if signupUser.passwordHash == passwordHashing(email, password) =>
+        Success(signupUser.userId)
+      case _ => Fail()
+    }
+    db.run(action.transactionally)
+  }
+
   private def createUsers[A](email: String, password: String, userName: String) = {
     for {
       userId <- createNewUserAction
@@ -82,5 +94,10 @@ object AuthenticationService {
     sealed trait SignupResult
     case class AlreadyExists() extends SignupResult
     case class NewUser(id: String, email: String, userName: String) extends SignupResult
+
+    case class Signin(email: String, password: String)
+    sealed trait SigninResult
+    case class Success(userId: String) extends SigninResult
+    case class Fail() extends SigninResult
   }
 }
