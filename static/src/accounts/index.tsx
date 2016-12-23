@@ -18,7 +18,7 @@ const PREFIX= "";
 
 const router = (
   <Router history={browserHistory}>
-    <Route path={PREFIX + "/"} component={Signup} />
+    <Route path={PREFIX + "/"} component={Home} />
     <Route path={PREFIX + "/signin"} component={Signin} />
     <Route path={PREFIX + "/signup"} component={Signup} />
     <Route path={PREFIX + "/home"} component={Home} />

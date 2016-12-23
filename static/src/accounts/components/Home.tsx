@@ -36,7 +36,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
           userName: response.body.userName
         });
       } else {
-        this.context.router.push("/");
+        this.context.router.push("/signin");
       }
     });
     document.title = "Home - accounts.onplatforms.net";

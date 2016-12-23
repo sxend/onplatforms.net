@@ -7,6 +7,8 @@ import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.event.Logging._
 import akka.http.scaladsl._
+import akka.http.scaladsl.model.HttpEntity
+import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
@@ -60,11 +62,16 @@ object Main {
             path("favicon.ico")(getFromResource("favicon.ico")) ~
             get(indexRouter.handle) // index page
         } ~ reject
-        val route = logRequest("access", InfoLevel)(mapping)
+        val route = access(InfoLevel)(mapping)
         Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
       }
     }
     server.run()
+  }
+
+  def access(level: LogLevel): Directive0 = Directive { inner => ctx =>
+    env.logger.log(level, s"access: ${ctx.request.copy(entity = HttpEntity("#concealing#"))}")
+    inner(())(ctx)
   }
 
   object ActorNames {
