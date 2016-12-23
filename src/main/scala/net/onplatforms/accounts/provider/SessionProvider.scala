@@ -6,7 +6,6 @@ import akka.http.scaladsl.model.headers.{HttpCookie, RawHeader}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
 import net.onplatforms.accounts.router.JsonProtocol
-import net.onplatforms.lib.kvs.Memcached
 import akka.http.scaladsl.server.Directives._
 import net.onplatforms.accounts.entity.Session
 import net.onplatforms.accounts.service.CacheService
@@ -55,11 +54,11 @@ trait SessionProvider extends AnyRef with JsonProtocol {
   private def getCache(sid: String): Future[Option[Session]] =
     cacheService.getSession(sid)
 
-  def setCSRFToken: Directive0 = withSession.flatMap { session =>
-    reCoverCSRFToken(session)
+  def withNewCSRFToken: Directive0 = withSession.flatMap { session =>
+    setNewCSRFToken(session)
   }
 
-  def reCoverCSRFToken(session: Session): Directive0 = {
+  def setNewCSRFToken(session: Session): Directive0 = {
     val token = generateCSRFToken
     setSession(session.sid, session.copy(csrfToken = Option(token))).tflatMap { _ =>
       respondWithDefaultHeader(RawHeader("X-CSRF-Token", token))
@@ -70,7 +69,7 @@ trait SessionProvider extends AnyRef with JsonProtocol {
     headerValueByName("X-CSRF-Token").flatMap { sendToken =>
       withSession.flatMap {
         case Session(_, _, Some(token)) if sendToken == token =>
-          Directive.Empty
+          pass
         case _ => reject
       }
     }

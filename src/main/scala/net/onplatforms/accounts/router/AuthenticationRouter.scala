@@ -52,7 +52,7 @@ class AuthenticationRouter(
     val protocol = Protocol.Signup(signup.userName, signup.email, signup.password)
     onComplete(askSignup(protocol)) {
       case Success(user: Protocol.NewUser) => withNewSession { session =>
-        reCoverCSRFToken(session.copy(userId = Option(user.id)))(complete(SignupResponse(location = "/home")))
+        setNewCSRFToken(session.copy(userId = Option(user.id)))(complete(SignupResponse(location = "/home")))
       }
       case Success(_: Protocol.AlreadyExists) => complete(StatusCodes.BadRequest, jsonMsg(s"${signup.email} account already exists"))
       case Failure(t)                         => failWith(t)
@@ -63,7 +63,7 @@ class AuthenticationRouter(
     val protocol = Protocol.Signin(signin.email, signin.password)
     onComplete(askSignin(protocol)) {
       case Success(success: Protocol.Success) => withNewSession { session =>
-        reCoverCSRFToken(session.copy(userId = Option(success.userId)))(complete(SigninResponse(location = "/home")))
+        setNewCSRFToken(session.copy(userId = Option(success.userId)))(complete(SigninResponse(location = "/home")))
       }
       case Success(_: Protocol.Fail) => complete(StatusCodes.BadRequest, jsonMsg(s"failed to signin ${signin.email}"))
       case Failure(t)                => failWith(t)

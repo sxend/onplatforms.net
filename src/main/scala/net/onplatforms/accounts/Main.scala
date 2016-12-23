@@ -53,11 +53,11 @@ object Main {
           pathPrefix("api" / "v1") {
             checkCSRFToken {
               signupRouter.routes ~ // self token setting
-                setCSRFToken {
+                withNewCSRFToken {
                   homeRouter.routes
                 }
             } ~
-              setCSRFToken(post(path("token")(complete(Empty())))) // token genarete endpoint
+              withNewCSRFToken(post(path("token")(complete(Empty())))) // token genarete endpoint
           } ~
             path("favicon.ico")(getFromResource("favicon.ico")) ~
             get(indexRouter.handle) // index page
