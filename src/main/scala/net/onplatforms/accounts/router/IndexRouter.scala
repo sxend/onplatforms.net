@@ -25,7 +25,8 @@ class IndexRouter(
   implicit val templateImplicits: Implicits = env.templateDirectiveImplicits
   private val config = Main.getConfigInNamespace("script")
   def handle: Route = withSession { session =>
-    val attr = Map("version" -> env.version,
+    val attr = Map(
+      "version" -> env.version,
       "bootstrap" -> config.getString("bootstrap"),
       "X_CSRF_Token" -> session.csrfToken.getOrElse(""))
     template("accounts/templates/index.html", attr) {

@@ -7,11 +7,15 @@ import akka.event.LoggingAdapter
 import akka.pattern._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
+import akka.util.Timeout
+import net.onplatforms.accounts.datasource.Tables.SignupUsersRow
 import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
-import net.onplatforms.accounts.service.{AuthenticationService, CacheService}
-import net.onplatforms.lib.kvs.Memcached
+import net.onplatforms.accounts.service.{AuthenticationService, CacheService, UserService}
 import spray.json._
+
+import scala.util._
+import scala.concurrent.duration._
 
 class HomeRouter(
   env: {
@@ -23,14 +27,24 @@ class HomeRouter(
 ) extends JsonProtocol with SessionProvider {
   override val cacheService: CacheService = env.cacheService
   private val userService: ActorRef = env.userService()
+  private implicit val timeout = Timeout(2.seconds)
 
   def routes = home
   private def home = get(path("home") {
     withSession {
       case Session(sid, Some(userId), token) =>
-        complete(HomeResponse(userId))
+        onComplete(getProfile(userId)) {
+          case Success(profile) if profile.singupUser.isDefined =>
+            complete(HomeResponse(profile.singupUser.map(_.userName).getOrElse("anonymous")))
+          case Success(_) => complete(StatusCodes.BadRequest, jsonMsg("user notfound"))
+          case Failure(t) =>
+            env.logger.error(t, t.getMessage)
+            complete(StatusCodes.BadRequest, jsonMsg("user notfound"))
+        }
       case msg =>
         complete(StatusCodes.BadRequest, jsonMsg("home api is private"))
     }
   })
+  private def getProfile(userId: String) =
+    userService.ask(UserService.Protocol.FindProfileByUserId(userId)).mapTo[UserService.Protocol.Profile]
 }
