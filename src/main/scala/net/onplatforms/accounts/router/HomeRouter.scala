@@ -24,7 +24,8 @@ class HomeRouter(
     val userService: () => ActorRef
     val logger: LoggingAdapter
   }
-) extends JsonProtocol with SessionProvider {
+) extends JsonProtocol
+  with SessionProvider with Directives {
   override val cacheService: CacheService = env.cacheService
   private val userService: ActorRef = env.userService()
   private implicit val timeout = Timeout(2.seconds)
@@ -32,19 +33,20 @@ class HomeRouter(
   def routes = home
   private def home = get(path("home") {
     withSession {
-      case Session(sid, Some(userId), token) =>
+      case Session(_, Some(userId), _) =>
         onComplete(getProfile(userId)) {
           case Success(profile) if profile.singupUser.isDefined =>
             complete(HomeResponse(profile.singupUser.map(_.userName).getOrElse("anonymous")))
-          case Success(_) => complete(StatusCodes.BadRequest, jsonMsg("user notfound"))
+          case Success(_) => notFound("user notfound")
           case Failure(t) =>
             env.logger.error(t, t.getMessage)
-            complete(StatusCodes.BadRequest, jsonMsg("user notfound"))
+            notFound("user notfound")
         }
       case msg =>
-        complete(StatusCodes.BadRequest, jsonMsg("home api is private"))
+        notFound("home api is private")
     }
   })
+
   private def getProfile(userId: String) =
     userService.ask(UserService.Protocol.FindProfileByUserId(userId)).mapTo[UserService.Protocol.Profile]
 }
