@@ -31,12 +31,14 @@ object Main {
         system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
       val templateDirectiveImplicits = TemplateDirective.Implicits(this)
       val indexRouter = new IndexRouter(this)
+      val socketRouter = new SocketRouter(this)
     }
     import env._
 
-    val mapping = Seq(
-      get(path("")(indexRouter.handle))
-    ).foldLeft[Route](reject)(_ ~ _)
+    val mapping = concat(
+      get(path("")(indexRouter.handle)),
+      path("socket")(socketRouter.handle)
+    )
 
     val route = logRequest("access", InfoLevel)(mapping)
     Http().bindAndHandle(route, systemConfig.getString("listen-address"), systemConfig.getInt("listen-port"))
