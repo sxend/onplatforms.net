@@ -7,10 +7,6 @@ import akka.pattern._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import net.onplatforms.lib.directive.Directives._
-import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.model.headers.HttpCookie
 import akka.util.Timeout
 import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
