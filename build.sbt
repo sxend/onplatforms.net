@@ -16,7 +16,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaHttpVersion = "10.0.0"
+  val akkaHttpVersion = "10.0.1"
   val spec2Version = "3.8.4"
   val slickVersion = "3.1.1"
   val log4jVersion = "2.7"
