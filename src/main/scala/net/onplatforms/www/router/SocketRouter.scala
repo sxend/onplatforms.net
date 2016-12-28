@@ -12,7 +12,7 @@ class SocketRouter(
 ) {
   implicit val materializer = env.materializer
 
-  def handle = handleSocketIOMessages(handler)
+  def handle = handleWebSocketMessages(handler)
 
   private def handler: Flow[Message, Message, Any] =
     Flow[Message].mapConcat {
@@ -22,8 +22,4 @@ class SocketRouter(
         bm.dataStream.runWith(Sink.ignore)
         Nil
     }
-  private def handleSocketIOMessages(handler: Flow[Message, Message, Any]) = {
-    // implement socket.io fallback logic
-    handleWebSocketMessages(handler)
-  }
 }
