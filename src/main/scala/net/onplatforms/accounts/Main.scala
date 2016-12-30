@@ -27,30 +27,36 @@ object Main {
   def getConfigInNamespace(suffix: String): Config = config.getConfig(withNamespace(suffix))
   val systemConfig: Config = getConfigInNamespace("system")
   val env = new {
+    self =>
+    private object Singletons {
+      lazy val authenticationService: ActorRef =
+        system.actorOf(Props(classOf[AuthenticationService], self), ActorNames.AuthenticationService.name)
+      lazy val userService: ActorRef =
+        system.actorOf(Props(classOf[UserService], self), ActorNames.UserService.name)
+      lazy val cacheService = new CacheService(self)
+    }
     val config: Config = Main.config
     val namespace: String = Main.namespace
     val version: String = systemConfig.getString("version")
-    implicit val system: ActorSystem = ActorSystem("accounts-system", this.config)
+    implicit val system: ActorSystem = ActorSystem("accounts-system", self.config)
     val logger: LoggingAdapter = Logging(system.eventStream, getClass)
     implicit val materializer = ActorMaterializer()
     val blockingContext: ExecutionContext =
       system.dispatchers.lookup(withNamespace("dispatchers.blocking-io-dispatcher"))
-    val mysql: MySQL = new MySQL(this)
-    val memcached: Memcached = new Memcached(this)
-    val templateDirectiveImplicits = TemplateDirective.Implicits(this)
-    lazy val authenticationService: () => ActorRef =
-      singleton(system.actorOf(Props(classOf[AuthenticationService], this), ActorNames.AuthenticationService.name))
-    lazy val userService: () => ActorRef =
-      singleton(system.actorOf(Props(classOf[UserService], this), ActorNames.UserService.name))
-    val cacheService: CacheService = new CacheService(this)
-    val indexRouter = new router.IndexRouter(this)
-    val signupRouter = new router.AuthenticationRouter(this)
-    val homeRouter = new router.HomeRouter(this)
+    val mysql: MySQL = new MySQL(self)
+    val memcached: Memcached = new Memcached(self)
+    val templateDirectiveImplicits = TemplateDirective.Implicits(self)
+    val authenticationService: () => ActorRef = () => Singletons.authenticationService
+    val userService: () => ActorRef = () => Singletons.userService
+    val cacheService: () => CacheService = () => Singletons.cacheService
+    val indexRouter = new router.IndexRouter(self)
+    val signupRouter = new router.AuthenticationRouter(self)
+    val homeRouter = new router.HomeRouter(self)
   }
   def main(args: Array[String]): Unit = {
     import env._
     val server = new {} with Runnable with SessionProvider {
-      override val cacheService: CacheService = env.cacheService
+      override val cacheService: CacheService = env.cacheService()
       override def run(): Unit = {
         val mapping = {
           pathPrefix("api" / "v1") {
@@ -75,15 +81,7 @@ object Main {
     env.logger.log(level, s"access: ${ctx.request.copy(entity = HttpEntity("#concealing#"))}")
     inner(())(ctx)
   }
-  private def singleton[A](creator: => A): () => A = {
-    var actor: Option[A] = None // non thread-safe!!!
-    () => {
-      if (actor.isEmpty) {
-        actor = Option(creator)
-      }
-      actor.get
-    }
-  }
+
   object ActorNames {
     class Generator(basename: String) {
       private val seqNr = new AtomicInteger(0)

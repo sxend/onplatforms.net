@@ -17,10 +17,10 @@ class IndexRouter(
   env: {
     val templateDirectiveImplicits: TemplateDirective.Implicits
     val version: String
-    val cacheService: CacheService
+    val cacheService: () => CacheService
   }
 ) extends JsonProtocol with SessionProvider {
-  override protected val cacheService: CacheService = env.cacheService
+  override protected val cacheService: CacheService = env.cacheService()
 
   implicit val templateImplicits: Implicits = env.templateDirectiveImplicits
   private val config = Main.getConfigInNamespace("script")

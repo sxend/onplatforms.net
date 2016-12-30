@@ -43,15 +43,6 @@ object Main {
     server.run()
   }
 
-  private def singleton[A](creator: => A): () => A = {
-    var actor: Option[A] = None // non thread-safe!!!
-    () => {
-      if (actor.isEmpty) {
-        actor = Option(creator)
-      }
-      actor.get
-    }
-  }
   object ActorNames {
     class Generator(basename: String) {
       private val seqNr = new AtomicInteger(0)
