@@ -20,14 +20,14 @@ import scala.concurrent.duration._
 class HomeRouter(
   env: => {
     val system: ActorSystem
-    val cacheService: () => CacheService
-    val userService: () => ActorRef
+    def cacheService: CacheService
+    def userService: ActorRef
     val logger: LoggingAdapter
   }
 ) extends JsonProtocol
   with SessionProvider with Directives {
-  override val cacheService: CacheService = env.cacheService()
-  private val userService: ActorRef = env.userService()
+  override val cacheService: CacheService = env.cacheService
+  private val userService: ActorRef = env.userService
   private implicit val timeout = Timeout(2.seconds)
 
   def routes = home

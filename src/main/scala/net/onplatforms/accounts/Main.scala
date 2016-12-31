@@ -46,9 +46,9 @@ object Main {
     val mysql: MySQL = new MySQL(self)
     val memcached: Memcached = new Memcached(self)
     val templateDirectiveImplicits = TemplateDirective.Implicits(self)
-    val authenticationService: () => ActorRef = () => Singletons.authenticationService
-    val userService: () => ActorRef = () => Singletons.userService
-    val cacheService: () => CacheService = () => Singletons.cacheService
+    def authenticationService: ActorRef = Singletons.authenticationService
+    def userService: ActorRef = Singletons.userService
+    def cacheService: CacheService = Singletons.cacheService
     val indexRouter = new router.IndexRouter(self)
     val signupRouter = new router.AuthenticationRouter(self)
     val homeRouter = new router.HomeRouter(self)
@@ -56,7 +56,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     import env._
     val server = new {} with Runnable with SessionProvider {
-      override val cacheService: CacheService = env.cacheService()
+      override val cacheService: CacheService = env.cacheService
       override def run(): Unit = {
         val mapping = {
           pathPrefix("api" / "v1") {
