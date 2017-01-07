@@ -16,6 +16,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
+  val akkaVersion = "2.4.16"
   val akkaHttpVersion = "10.0.1"
   val spec2Version = "3.8.4"
   val slickVersion = "3.1.1"
@@ -37,7 +38,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
-    "com.typesafe.akka" %% "akka-slf4j" % "2.4.14",
+    "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4jVersion,
     "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
     "org.apache.logging.log4j" % "log4j-api" % log4jVersion,
