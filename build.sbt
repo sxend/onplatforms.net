@@ -25,7 +25,7 @@ libraryDependencies ++= {
     "com.typesafe.slick" %% "slick" % slickVersion,
     "com.typesafe.slick" %% "slick-hikaricp" % slickVersion excludeAll ExclusionRule(organization = "com.zaxxer", name = "HikariCP-java6"),
     "com.typesafe.slick" %% "slick-codegen" % slickVersion,
-    "joda-time" % "joda-time" % "2.7",
+    "joda-time" % "joda-time" % "2.9.7",
     "org.joda" % "joda-convert" % "1.7",
     "mysql" % "mysql-connector-java" % "6.0.5",
     "com.zaxxer" % "HikariCP" % "2.5.1",
