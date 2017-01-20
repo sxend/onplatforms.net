@@ -5,6 +5,10 @@ machine:
     - docker
   environment:
     APP_VERSION: b${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1}
+  node:
+    version: 6.9.1
+  post:
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
 dependencies:
   pre:
     - mkdir -p ~/.aws
@@ -12,12 +16,11 @@ dependencies:
     - envsubst < .aws/config.template > ~/.aws/config
     - mkdir -p ~/.bintray && envsubst < .credentials > ~/.bintray/.credentials
     - mkdir -p ~/.docker && aws s3 cp s3://internal-storage.onplatforms.net/docker/config.json ~/.docker/config.json
-    - nvm install v6.9.1 && nvm alias default v6.9.1
   override:
     - sbt compile assembly
     - ./scripts/build-profile.sh www 9090 ${APP_VERSION}
     - ./scripts/build-profile.sh accounts 9091 ${APP_VERSION}
-    - cd static && npm install && npm run build
+    - cd static && yarn install && npm run build
 deployment:
   publish:
     branch: master
