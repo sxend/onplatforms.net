@@ -1,9 +1,9 @@
 package net.onplatforms.www.router
 
 import akka.http.scaladsl.model.ws._
-import akka.stream.scaladsl._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl._
 
 class SocketRouter(
   env: {

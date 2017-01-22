@@ -1,21 +1,16 @@
 package net.onplatforms.accounts.router
 
-import java.util.UUID
-
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.event.LoggingAdapter
-import akka.pattern._
-import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
+import akka.pattern._
 import akka.util.Timeout
-import net.onplatforms.accounts.datasource.Tables.SignupUsersRow
 import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
-import net.onplatforms.accounts.service.{AuthenticationService, CacheService, UserService}
-import spray.json._
+import net.onplatforms.accounts.service.{CacheService, UserService}
 
-import scala.util._
 import scala.concurrent.duration._
+import scala.util._
 
 class HomeRouter(
   env: => {

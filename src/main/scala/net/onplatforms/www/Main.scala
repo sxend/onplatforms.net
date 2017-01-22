@@ -1,15 +1,14 @@
 package net.onplatforms.www
 
 import akka.actor.ActorSystem
-import akka.event.Logging._
 import akka.event.Logging
+import akka.event.Logging._
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
+import com.typesafe.config.{Config, ConfigFactory}
 import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.www.router._
-import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContext
 

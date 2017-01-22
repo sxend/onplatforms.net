@@ -3,7 +3,6 @@ package net.onplatforms.accounts.router
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.typesafe.config.Config
 import net.onplatforms.accounts.Main
 import net.onplatforms.accounts.provider.SessionProvider
 import net.onplatforms.accounts.service.CacheService

@@ -1,15 +1,14 @@
 package net.onplatforms.accounts
 
-import java.util.UUID
-import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
+import java.util.concurrent.atomic.AtomicInteger
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props, TypedActor, TypedProps}
-import akka.event.{Logging, LoggingAdapter}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.event.Logging._
+import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl._
 import akka.http.scaladsl.model.HttpEntity
-import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 import net.onplatforms.accounts.provider.SessionProvider
@@ -18,7 +17,7 @@ import net.onplatforms.lib.directive.TemplateDirective
 import net.onplatforms.lib.kvs.Memcached
 import net.onplatforms.lib.rdb.MySQL
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.ExecutionContext
 
 object Main {
   val config: Config = ConfigFactory.load

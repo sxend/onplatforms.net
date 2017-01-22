@@ -5,14 +5,12 @@ import java.util.UUID
 import akka.http.scaladsl.model.headers.{HttpCookie, RawHeader}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
-import net.onplatforms.accounts.router.JsonProtocol
-import akka.http.scaladsl.server.Directives._
 import com.typesafe.config.ConfigFactory
 import net.onplatforms.accounts.entity.Session
+import net.onplatforms.accounts.router.JsonProtocol
 import net.onplatforms.accounts.service.CacheService
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration._
 
 trait SessionProvider extends AnyRef with JsonProtocol {
   protected val cacheService: CacheService

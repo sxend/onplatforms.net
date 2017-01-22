@@ -1,17 +1,14 @@
 package net.onplatforms.accounts.service
 
-import java.util.UUID
-
-import AuthenticationService.Protocol._
 import akka.actor.Actor
 import akka.event.LoggingAdapter
 import akka.pattern._
 import com.typesafe.config.Config
-import net.onplatforms.accounts.datasource.Tables
 import net.onplatforms.accounts.db.Actions._
+import net.onplatforms.accounts.service.AuthenticationService.Protocol._
 import net.onplatforms.lib.rdb.MySQL
-import slick.driver.MySQLDriver.api._
 import org.apache.commons.codec.digest.DigestUtils
+import slick.driver.MySQLDriver.api._
 
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}

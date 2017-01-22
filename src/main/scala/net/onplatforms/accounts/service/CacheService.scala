@@ -5,8 +5,8 @@ import com.typesafe.config.Config
 import net.onplatforms.accounts.entity.Session
 import net.onplatforms.lib.kvs.Memcached
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class CacheService(
   env: {

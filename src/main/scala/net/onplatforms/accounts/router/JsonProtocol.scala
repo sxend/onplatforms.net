@@ -3,7 +3,6 @@ package net.onplatforms.accounts.router
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import net.onplatforms.accounts.entity._
 import spray.json.DefaultJsonProtocol
-import spray.json._
 
 trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
   case class Empty()

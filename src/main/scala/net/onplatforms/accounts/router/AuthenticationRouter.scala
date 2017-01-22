@@ -1,22 +1,18 @@
 package net.onplatforms.accounts.router
 
-import java.util.UUID
-
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
-import akka.pattern._
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.pattern._
 import akka.util.Timeout
 import net.onplatforms.accounts.entity._
 import net.onplatforms.accounts.provider.SessionProvider
-import net.onplatforms.accounts.service.{AuthenticationService, CacheService}
 import net.onplatforms.accounts.service.AuthenticationService.Protocol
-import net.onplatforms.lib.kvs.Memcached
-import spray.json._
+import net.onplatforms.accounts.service.{AuthenticationService, CacheService}
 
-import scala.util.{Failure, Success}
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 class AuthenticationRouter(
   env: => {
